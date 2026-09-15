@@ -1,0 +1,7 @@
+F aPerm loop
+headlights at F ok 58 fail 242
+R aPerm loop
+headlights at R ok 52 fail 248
+headlights at B ok 300 fail 0
+L aPerm loop
+headlights at L ok 45 fail 255

@@ -1,0 +1,17 @@
+run 1 lite {"totalMs":771.4,"timing":{"moveTablesMs":174.4,"htm_p1_TS_FS_Ms":343.3,"htm_p2_Ms":238.3}}
+run 2 lite {"totalMs":692.1,"timing":{"moveTablesMs":167.8,"htm_p1_TS_FS_Ms":302.3,"htm_p2_Ms":215.3}}
+run 3 lite {"totalMs":695.1,"timing":{"moveTablesMs":164.7,"htm_p1_TS_FS_Ms":309.6,"htm_p2_Ms":214.5}}
+SUMMARY lite {"medianTotalMs":695.1,"moveTableBytes":2428440,"pruneTableBytes":4031685,"rssMB":62.6,"arrayBuffersMB":6.2}
+run 1 htm {"totalMs":1267.7,"timing":{"moveTablesMs":162.3,"htm_p1_TS_FS_Ms":295.8,"htm_p2_Ms":212.3,"htm_p1_TF_Ms":584.3}}
+run 2 htm {"totalMs":1290.9,"timing":{"moveTablesMs":174,"htm_p1_TS_FS_Ms":294.9,"htm_p2_Ms":216.4,"htm_p1_TF_Ms":593.3}}
+run 3 htm {"totalMs":1250.4,"timing":{"moveTablesMs":160.6,"htm_p1_TS_FS_Ms":288.2,"htm_p2_Ms":208.2,"htm_p1_TF_Ms":582.5}}
+SUMMARY htm {"medianTotalMs":1267.7,"moveTableBytes":2428440,"pruneTableBytes":8510661,"rssMB":65.9,"arrayBuffersMB":10.4}
+run 1 qtm {"totalMs":975.6,"timing":{"moveTablesMs":161.2,"qtm_p1_TS_FS_Ms":208.1,"qtm_p2_Ms":175.8,"qtm_p1_TF_Ms":416.3,"qtm_cp_Ms":3.7}}
+run 2 qtm {"totalMs":1027.2,"timing":{"moveTablesMs":166.1,"qtm_p1_TS_FS_Ms":218.3,"qtm_p2_Ms":192.1,"qtm_p1_TF_Ms":435.6,"qtm_cp_Ms":3.8}}
+run 3 qtm {"totalMs":1062.1,"timing":{"moveTablesMs":184.2,"qtm_p1_TS_FS_Ms":230.4,"qtm_p2_Ms":192.6,"qtm_p1_TF_Ms":439.3,"qtm_cp_Ms":4.1}}
+SUMMARY qtm {"medianTotalMs":1027.2,"moveTableBytes":2428440,"pruneTableBytes":8550981,"rssMB":65.8,"arrayBuffersMB":10.5}
+run 1 full {"totalMs":2155.2,"timing":{"moveTablesMs":167.6,"htm_p1_TS_FS_Ms":298.4,"htm_p2_Ms":218.1,"htm_p1_TF_Ms":611.2,"htm_cp_Ms":6,"qtm_p1_TS_FS_Ms":234.4,"qtm_p2_Ms":143.7,"qtm_p1_TF_Ms":452.5,"qtm_cp_Ms":3.6}}
+run 2 full {"totalMs":2121.8,"timing":{"moveTablesMs":172.1,"htm_p1_TS_FS_Ms":305.8,"htm_p2_Ms":216,"htm_p1_TF_Ms":578.3,"htm_cp_Ms":6.1,"qtm_p1_TS_FS_Ms":226.3,"qtm_p2_Ms":141.4,"qtm_p1_TF_Ms":453,"qtm_cp_Ms":5.1}}
+run 3 full {"totalMs":2053.9,"timing":{"moveTablesMs":158.7,"htm_p1_TS_FS_Ms":289.6,"htm_p2_Ms":222.4,"htm_p1_TF_Ms":581.3,"htm_cp_Ms":5.8,"qtm_p1_TS_FS_Ms":220.9,"qtm_p2_Ms":138.3,"qtm_p1_TF_Ms":415.9,"qtm_cp_Ms":3.6}}
+SUMMARY full {"medianTotalMs":2121.8,"moveTableBytes":2428440,"pruneTableBytes":17101962,"rssMB":74.3,"arrayBuffersMB":18.6}
+TABLES {"moveTables":{"twistMove":78732,"flipMove":73728,"sliceMove":17820,"cpMove":1451520,"epMove":806400,"spMove":240},"pruneTables":{"htm.p1TS":1082565,"htm.p1FS":1013760,"htm.p1TF":4478976,"htm.p2CS":967680,"htm.p2ES":967680,"htm.cpFull":40320,"qtm.p1TS":1082565,"qtm.p1FS":1013760,"qtm.p1TF":4478976,"qtm.p2CS":967680,"qtm.p2ES":967680,"qtm.cpFull":40320},"maxDepth":{"htm.p1TS":9,"htm.p1FS":9,"htm.p1TF":9,"htm.p2CS":14,"htm.p2ES":12,"htm.cpFull":7,"qtm.p1TS":11,"qtm.p1FS":10,"qtm.p1TF":10,"qtm.p2CS":22,"qtm.p2ES":19,"qtm.cpFull":8}}

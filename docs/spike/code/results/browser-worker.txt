@@ -1,0 +1,159 @@
+browser 141.0.7390.37
+INIT qtm-config run 1 {"job":"init","initMs":1246.2,"timing":{"moveTablesMs":235.1999999997206,"qtm_p1_TS_FS_Ms":255.10000000009313,"qtm_p2_Ms":199,"qtm_p1_TF_Ms":538.5,"qtm_cp_Ms":5.099999999627471}}
+INIT qtm-config run 2 {"job":"init","initMs":1180,"timing":{"moveTablesMs":205.8000000002794,"qtm_p1_TS_FS_Ms":222,"qtm_p2_Ms":197.5,"qtm_p1_TF_Ms":538.1000000000931,"qtm_cp_Ms":5.300000000279397}}
+INIT qtm-config run 3 {"job":"init","initMs":1111.3,"timing":{"moveTablesMs":168.10000000009313,"qtm_p1_TS_FS_Ms":210.70000000018626,"qtm_p2_Ms":187.79999999981374,"qtm_p1_TF_Ms":529.2000000001863,"qtm_cp_Ms":4.699999999720603}}
+INIT htm-config run 1 {"initMs":1454.9}
+INIT htm-config run 2 {"initMs":1443.9}
+INIT htm-config run 3 {"initMs":1452.2}
+INIT qtm-config median 1180
+SOLVE {
+ "job": "solve",
+ "initMs": 1151.6,
+ "timing": {
+  "moveTablesMs": 155.60000000009313,
+  "qtm_p1_TS_FS_Ms": 232,
+  "qtm_p2_Ms": 218.09999999962747,
+  "qtm_p1_TF_Ms": 530.4000000003725,
+  "qtm_cp_Ms": 4.399999999906868
+ },
+ "QTM 第一組解即停": {
+  "solved": 100,
+  "timeMs": {
+   "n": 100,
+   "mean": 12.513,
+   "p50": 8.8,
+   "p95": 36.8,
+   "max": 71.3
+  },
+  "htm": {
+   "n": 100,
+   "mean": 23.01,
+   "p50": 23,
+   "p95": 25,
+   "max": 25
+  },
+  "qtm": {
+   "n": 100,
+   "mean": 30.45,
+   "p50": 30,
+   "p95": 32,
+   "max": 32
+  }
+ },
+ "QTM 固定改進 100ms": {
+  "solved": 100,
+  "timeMs": {
+   "n": 100,
+   "mean": 100.105,
+   "p50": 100.1,
+   "p95": 100.1,
+   "max": 100.2
+  },
+  "htm": {
+   "n": 100,
+   "mean": 21.58,
+   "p50": 22,
+   "p95": 24,
+   "max": 24
+  },
+  "qtm": {
+   "n": 100,
+   "mean": 27.55,
+   "p50": 28,
+   "p95": 30,
+   "max": 31
+  }
+ },
+ "optimalDepth12": {
+  "solved": 10,
+  "timeMs": {
+   "n": 10,
+   "mean": 5.28,
+   "p50": 2.8,
+   "p95": 20,
+   "max": 20
+  }
+ },
+ "optimalDepth13": {
+  "solved": 10,
+  "timeMs": {
+   "n": 10,
+   "mean": 30.7,
+   "p50": 24.3,
+   "p95": 67,
+   "max": 67
+  }
+ },
+ "optimalDepth14": {
+  "solved": 10,
+  "timeMs": {
+   "n": 10,
+   "mean": 194.23,
+   "p50": 173.8,
+   "p95": 333,
+   "max": 333
+  }
+ }
+}
+SOLVE-HTM {
+ "job": "solve",
+ "initMs": 1492.8,
+ "timing": {
+  "moveTablesMs": 163.10000000009313,
+  "htm_p1_TS_FS_Ms": 324.09999999962747,
+  "htm_p2_Ms": 231,
+  "htm_p1_TF_Ms": 763.5
+ },
+ "HTM 第一組解即停": {
+  "solved": 100,
+  "timeMs": {
+   "n": 100,
+   "mean": 5.851,
+   "p50": 5,
+   "p95": 17.2,
+   "max": 24.3
+  },
+  "htm": {
+   "n": 100,
+   "mean": 21.79,
+   "p50": 22,
+   "p95": 23,
+   "max": 23
+  },
+  "qtm": {
+   "n": 100,
+   "mean": 32.43,
+   "p50": 32,
+   "p95": 35,
+   "max": 36
+  }
+ },
+ "HTM 目標≤21（上限 2000ms）": {
+  "solved": 100,
+  "timeMs": {
+   "n": 100,
+   "mean": 43.291,
+   "p50": 9.3,
+   "p95": 151.7,
+   "max": 1482.4
+  },
+  "htm": {
+   "n": 100,
+   "mean": 20.83,
+   "p50": 21,
+   "p95": 21,
+   "max": 21
+  },
+  "qtm": {
+   "n": 100,
+   "mean": 30.77,
+   "p50": 31,
+   "p95": 34,
+   "max": 35
+  }
+ }
+}
+
+real	0m30.960s
+user	0m0.940s
+sys	0m0.792s

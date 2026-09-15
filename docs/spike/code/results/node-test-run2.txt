@@ -1,0 +1,122 @@
+TAP version 13
+# Subtest: 每個轉動做 4 次（180° 做 2 次）等於原狀
+ok 1 - 每個轉動做 4 次（180° 做 2 次）等於原狀
+  ---
+  duration_ms: 1.954947
+  type: 'test'
+  ...
+# Subtest: X 與 X′ 互逆，X2 = X·X
+ok 2 - X 與 X′ 互逆，X2 = X·X
+  ---
+  duration_ms: 0.279669
+  type: 'test'
+  ...
+# Subtest: U 轉動方向：前面頂排移到左面（從上方看順時針）
+ok 3 - U 轉動方向：前面頂排移到左面（從上方看順時針）
+  ---
+  duration_ms: 0.130095
+  type: 'test'
+  ...
+# Subtest: 角塊命名的三個面皆為同一旋向（順時針）
+ok 4 - 角塊命名的三個面皆為同一旋向（順時針）
+  ---
+  duration_ms: 0.26359
+  type: 'test'
+  ...
+# Subtest: cubie 乘法與貼紙層級轉動一致（隨機 500 組序列）
+ok 5 - cubie 乘法與貼紙層級轉動一致（隨機 500 組序列）
+  ---
+  duration_ms: 47.359631
+  type: 'test'
+  ...
+# Subtest: 合法性檢查：正例（隨機狀態與打亂）
+ok 6 - 合法性檢查：正例（隨機狀態與打亂）
+  ---
+  duration_ms: 8.803922
+  type: 'test'
+  ...
+# Subtest: 合法性檢查：反例（單角扭轉、單邊翻轉、兩塊互換、重複方塊）
+ok 7 - 合法性檢查：反例（單角扭轉、單邊翻轉、兩塊互換、重複方塊）
+  ---
+  duration_ms: 0.13676
+  type: 'test'
+  ...
+# Subtest: 貼紙字串錯誤碼
+ok 8 - 貼紙字串錯誤碼
+  ---
+  duration_ms: 0.338909
+  type: 'test'
+  ...
+# Subtest: 從貼紙顏色建立狀態：任意顏色名稱，依中心判定
+ok 9 - 從貼紙顏色建立狀態：任意顏色名稱，依中心判定
+  ---
+  duration_ms: 0.522271
+  type: 'test'
+  ...
+# Subtest: 座標：set/get 互逆，已解狀態座標
+ok 10 - 座標：set/get 互逆，已解狀態座標
+  ---
+  duration_ms: 0.413725
+  type: 'test'
+  ...
+# Subtest: seeded RNG：同 seed 同結果、不同 seed 不同結果
+ok 11 - seeded RNG：同 seed 同結果、不同 seed 不同結果
+  ---
+  duration_ms: 1.270172
+  type: 'test'
+  ...
+# Subtest: 整顆轉向共軛：conj(序列) 等於 轉向後的序列
+ok 12 - 整顆轉向共軛：conj(序列) 等於 轉向後的序列
+  ---
+  duration_ms: 3.604552
+  type: 'test'
+  ...
+# Subtest: 記號解析與反轉
+ok 13 - 記號解析與反轉
+  ---
+  duration_ms: 0.184393
+  type: 'test'
+  ...
+# Subtest: 1,000 個 random-state（seed=20260915）HTM 兩階段求解後必定復原
+ok 14 - 1,000 個 random-state（seed=20260915）HTM 兩階段求解後必定復原
+  ---
+  duration_ms: 10744.115902
+  type: 'test'
+  ...
+# 復原 1000/1000；HTM 最長 24、平均 21.18；該解換算 QTM 最長 38
+# Subtest: 100 個 random-state 以 QTM 成本搜尋後必定復原
+ok 15 - 100 個 random-state 以 QTM 成本搜尋後必定復原
+  ---
+  duration_ms: 1384.982232
+  type: 'test'
+  ...
+# QTM 搜尋 100/100 復原；QTM 最長 32
+# Subtest: 節點預算（不讀時鐘）結果可重現
+ok 16 - 節點預算（不讀時鐘）結果可重現
+  ---
+  duration_ms: 541.459816
+  type: 'test'
+  ...
+# nodeLimit=300000：平均 13.3 ms、479898 節點／局
+# Subtest: 已解狀態回傳空解；非法狀態回傳錯誤碼
+ok 17 - 已解狀態回傳空解；非法狀態回傳錯誤碼
+  ---
+  duration_ms: 0.373391
+  type: 'test'
+  ...
+# Subtest: 短打亂 QTM 最少步：與暴力 BFS（深度 ≤ 5）結果一致
+ok 18 - 短打亂 QTM 最少步：與暴力 BFS（深度 ≤ 5）結果一致
+  ---
+  duration_ms: 664.343258
+  type: 'test'
+  ...
+# BFS 狀態數 105046；與 BFS 逐一比對 75 局
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15991.71288

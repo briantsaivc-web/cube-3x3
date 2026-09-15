@@ -1,0 +1,6 @@
+solver.js {"bytes":37711,"gzipBytes":12124,"lines":863}
+10679 bench.js
+ 4489 bench-browser.js
+ 7481 tests/cube.test.js
+ 3764 tests/solve.test.js
+26413 total

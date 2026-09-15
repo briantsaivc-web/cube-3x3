@@ -1,0 +1,15 @@
+{
+  "name": "cube-3x3",
+  "version": "0.0.0",
+  "private": true,
+  "description": "魔術方塊（暫名）：三階魔術方塊單頁網頁遊戲（零依賴、單一 index.html）",
+  "scripts": {
+    "build": "node build/bundle.js",
+    "test:engine": "node --test \"tests/engine/**/*.test.js\"",
+    "test:ui": "node tests/ui/smoke.spec.js",
+    "test": "npm run test:engine && npm run build && npm run test:ui"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}

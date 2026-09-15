@@ -1,0 +1,7 @@
+node_modules/
+*.backup.*
+scratch/
+.DS_Store
+test-results/
+playwright-report/
+_to_delete/

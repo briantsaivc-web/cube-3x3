@@ -1,0 +1,30 @@
+(a) random-state seed=20260915：1000 局全部復原；總 QTM 平均 173.6、p50 175、p95 207、最小 95、最大 232；記號數（含整顆旋轉）最大 227
+  hold           平均   0.0  p95   0  最大   0
+  cross          平均  21.4  p95  28  最大  32
+  corners        平均  51.4  p95  73  最大  90
+  middle         平均  37.0  p95  47  最大  62
+  yellowCross    平均  11.0  p95  20  最大  20
+  yellowFace     平均  20.2  p95  28  最大  29
+  yellowCorners  平均  13.6  p95  26  最大  27
+  yellowEdges    平均  19.1  p95  36  最大  36
+(b) 40 記號隨機序列（含 M/E/S 與 x/y/z）seed=31415：1000 局全部復原；總 QTM 平均 173.3、p50 174、p95 209、最小 97、最大 236；記號數（含整顆旋轉）最大 237
+  hold           平均   0.0  p95   0  最大   0
+  cross          平均  21.3  p95  28  最大  32
+  corners        平均  51.2  p95  73  最大  87
+  middle         平均  37.3  p95  47  最大  63
+  yellowCross    平均  10.5  p95  20  最大  20
+  yellowFace     平均  20.1  p95  28  最大  29
+  yellowCorners  平均  13.9  p95  26  最大  27
+  yellowEdges    平均  18.9  p95  36  最大  36
+(c) 末層全列舉 62208 種：62208 局全部復原；總 QTM 平均 63.3、p50 64、p95 87、最小 0、最大 112；記號數（含整顆旋轉）最大 98
+  hold           平均   0.0  p95   0  最大   0
+  cross          平均   0.0  p95   0  最大   0
+  corners        平均   0.0  p95   0  最大   0
+  middle         平均   0.0  p95   0  最大   0
+  yellowCross    平均  10.6  p95  20  最大  20
+  yellowFace     平均  19.9  p95  28  最大  29
+  yellowCorners  平均  13.8  p95  26  最大  27
+  yellowEdges    平均  19.0  p95  36  最大  36
+公式重複次數上限（全部樣本）：{"maxCornerRepeat":5,"maxSune":3,"maxAPerm":2,"maxUPerm":3}
+1000 局：整顆旋轉記號共 12243 個、每局最多 17 個；相鄰同字母整顆旋轉 478 處
+近復原狀態 7495 個全部完成；其中最長 233 QTM

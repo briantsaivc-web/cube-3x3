@@ -1,0 +1,6 @@
+TF lite {"N":200,"seed":2718,"hitTarget21":199,"timeToTarget21Ms":{"n":200,"mean":38.119,"p50":9.03,"p95":106.01,"max":2000.006,"min":0.081},"firstSolutionMs":{"n":200,"mean":5.095,"p50":3.341,"p95":14.848,"max":26.215,"min":0.08},"htm":{"n":200,"mean":20.79,"p50":21,"p95":21,"max":22,"min":18}}
+TF full {"N":200,"seed":2718,"hitTarget21":200,"timeToTarget21Ms":{"n":200,"mean":25.333,"p50":7.389,"p95":66.516,"max":1216.622,"min":0.131},"firstSolutionMs":{"n":200,"mean":4.59,"p50":2.822,"p95":13.104,"max":25.609,"min":0.13},"htm":{"n":200,"mean":20.78,"p50":21,"p95":21,"max":21,"min":18}}
+
+real	0m14.780s
+user	0m14.849s
+sys	0m0.072s
