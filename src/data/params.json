@@ -1,0 +1,30 @@
+{
+  "scramble": { "length": 25 },
+  "solver": { "metric": "qtm", "nodeLimit": 3000000, "firstNodeLimit": 30000000, "maxLength": 45, "phase2Cap": 20,
+    "initTimeoutMs": 20000, "solveTimeoutMs": 10000, "planCacheSize": 64 },
+  "demo": { "speeds": [ { "id": "slow", "stepMs": 900 }, { "id": "mid", "stepMs": 500 }, { "id": "fast", "stepMs": 250 } ],
+    "defaultSpeed": "mid", "animRatio": 0.8, "pauseAtSegmentEnd": true },
+  "gesture": { "lockPx": 10, "commitPx": 30, "maxAxisAngleDeg": 30, "cameraDegPerPx": 0.5, "pitchLimitDeg": 80 },
+  "ui": { "turnAnimMs": 180, "scrambleAnimMsPerMove": 60, "timerRefreshMs": 100, "minTouchPx": 44,
+    "snapAnimMs": 200, "baseViewDeg": { "x": -22, "y": -34 }, "hintErrorShowMs": 4000, "demoErrorShowMs": 6000 },
+  "input": { "queueMax": 3, "queuePollMs": 16 },
+  "debug": { "rejectLogSize": 50, "logRejectToConsole": false },
+  "layout": { "drawerExpandedDefault": true },
+  "keypad": { "sliceCollapsedDefault": true, "rotationCollapsedDefault": false, "showSubLabels": true },
+  "faceLabels": { "defaultOn": false, "forceOnInTutorial": true },
+  "tutorial": {
+    "enabled": true,
+    "notationBeforeIndex": 2,
+    "notationSteps": [
+      { "id": "faces", "demo": "U" },
+      { "id": "clockwise", "demo": "R" },
+      { "id": "prime", "demo": "R'" },
+      { "id": "double", "demo": "U2" },
+      { "id": "slice", "demo": "M" },
+      { "id": "rotation", "demo": "x" },
+      { "id": "qtm", "demo": "R2" }
+    ],
+    "demoTurnMs": 600, "demoHoldMs": 700
+  },
+  "storage": { "recordsKey": "cube3x3.records.v1", "tutorialKey": "cube3x3.tutorial.v1" }
+}

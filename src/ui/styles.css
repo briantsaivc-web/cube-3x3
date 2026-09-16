@@ -1,0 +1,220 @@
+/* src/ui/styles.css — 主樣式：版型 C（學習導向）＋ CSS 3D 方塊（game-spec.md §9、§11） */
+/* 依分派單 T-001 S8a；視覺參考 docs/ui/v1-C.html（行為與尺寸以規格為準，見 §11.1 差異表）。 */
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #e7e7e4;
+  color: #111;
+  font-family: "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+}
+button { font-family: inherit; }
+[hidden] { display: none !important; }
+
+.app { position: relative; height: 100%; overflow: hidden; }
+.shell { display: flex; flex-direction: column; height: 100%; background: #fff; }
+.leftcol { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+
+/* ---- 狀態列 ---- */
+.statusbar {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 18px;
+  padding: 8px 14px; font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+.statusbar .stat { display: flex; flex-direction: column; line-height: 1.25; }
+.statusbar .k { color: #777; font-size: 11px; }
+.statusbar .v { font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* ---- D-19：步數旁的 QTM 小說明（texts.hud.qtmNote），可點元素 ≥44×44 ---- */
+.statusbar .v-row { display: flex; align-items: center; gap: 4px; }
+.qtm-note-btn {
+  min-width: 44px; min-height: 44px; padding: 0; border-radius: 999px;
+  border: 1.5px solid #999; background: #fff; color: #666; font-size: 13px; font-weight: 700;
+}
+.qtm-note-btn[aria-expanded="true"] { border-color: #0a6cff; color: #0a6cff; background: #eef3ff; }
+.qtm-note-line {
+  flex: 0 0 auto; padding: 6px 14px; font-size: 12px; color: #555; line-height: 1.5;
+  background: #f2f6ff; border-bottom: 1px solid #dbe6ff;
+}
+.badge {
+  display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px;
+  border-radius: 999px; font-size: 12px; font-weight: 700;
+  background: #fff3cd; color: #8a6100; border: 1px solid #f0c96a;
+}
+
+/* ---- 方塊 3D 舞台 ---- */
+.cube-scene {
+  position: relative; flex: 1 1 auto; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  perspective: 900px; touch-action: none; background: #f7f8fa;
+}
+.cube-stage { position: relative; width: 0; height: 0; }
+.cube3d { position: relative; width: 0; height: 0; transform-style: preserve-3d; }
+.cube-world { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+
+.cube-scene { --cs: 34px; --gap: 2px; --step: calc(var(--cs) + var(--gap)); }
+@media (orientation: landscape) { .cube-scene { --cs: 46px; } }
+
+.cubie {
+  position: absolute; width: var(--cs); height: var(--cs);
+  left: calc(var(--cs) / -2); top: calc(var(--cs) / -2);
+  transform-style: preserve-3d;
+  transform: translate3d(calc(var(--gx) * var(--step)), calc(var(--gy) * var(--step)), calc(var(--gz) * var(--step)));
+}
+.face {
+  position: absolute; width: var(--cs); height: var(--cs);
+  border-radius: calc(var(--cs) * .14);
+  box-shadow: inset 0 0 0 calc(var(--cs) * .07) rgba(0, 0, 0, .35);
+  display: flex; align-items: center; justify-content: center;
+  backface-visibility: hidden;
+}
+.f-F { transform: translateZ(calc(var(--cs) / 2)); }
+.f-B { transform: rotateY(180deg) translateZ(calc(var(--cs) / 2)); }
+.f-R { transform: rotateY(90deg) translateZ(calc(var(--cs) / 2)); }
+.f-L { transform: rotateY(-90deg) translateZ(calc(var(--cs) / 2)); }
+.f-U { transform: rotateX(90deg) translateZ(calc(var(--cs) / 2)); }
+.f-D { transform: rotateX(-90deg) translateZ(calc(var(--cs) / 2)); }
+.face.is-hi { box-shadow: inset 0 0 0 calc(var(--cs) * .16) #ffb300, 0 0 8px 2px rgba(255, 179, 0, .8); }
+
+.face-label {
+  pointer-events: none; text-align: center; line-height: 1.1;
+  font-size: calc(var(--cs) * .26); font-weight: 700; user-select: none;
+}
+.face-label b { display: block; font-size: calc(var(--cs) * .34); }
+.face-label i { display: block; font-style: normal; font-size: calc(var(--cs) * .2); opacity: .85; }
+/* D-20：U 面（頂面）用 rotateX(90deg) 折起，在固定基準視角（baseViewDeg x:-22°）下
+   會讓標籤文字明顯歪斜（見 docs/reports/T-001-arch-decisions.md D-20）。基準視角是常數，
+   所以用固定角度的 2D 反向旋轉即可讓文字保持從目前視角可讀；此值僅對應 baseViewDeg，
+   若日後改動基準視角需要重新用截圖核對（見 T-001-S8e 回報）。其餘五面（F／R／D／L／B）
+   在目前視角下皆可讀，不需要此修正。 */
+.f-U .face-label { transform: rotate(-25deg); }
+
+.turn-wrapper { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+
+/* D-18：提示浮層原本固定貼在 .cube-scene 內的右上角、寬度可達 78vw，手機直向時
+   方塊區本來就矮（學習面板抽屜預設展開就占掉畫面 56vh），會整個蓋住方塊與層高亮
+   （見 docs/reports/T-001-arch-decisions.md D-18）。改成：手機直向（本區塊，行動裝置
+   優先）時 .hint-slot 是方塊區與操作列之間的一般文件流（index.template.html 已把它
+   搬出 .cube-scene，改放在方塊區下緣、操作列上方），完全不會與方塊重疊，沒有提示時
+   內容清空、高度歸零，不佔版面；iPad 橫向（見下方 @media landscape）改回貼在方塊右上角
+   的浮層，維持原本設計（iPad 空間充裕，右上角浮層本來就沒有蓋住方塊的問題）。 */
+.hint-slot {
+  flex: 0 0 auto; display: flex; justify-content: center; padding: 0 4%;
+  pointer-events: none;
+}
+.hint-slot > * { pointer-events: auto; margin: 4px 0; }
+
+.scramble-line {
+  flex: 0 0 auto; padding: 4px 14px; font-size: 12px; color: #555; line-height: 1.5;
+}
+.scramble-note { color: #999; }
+
+/* ---- 操作列 ---- */
+.controlbar { flex: 0 0 auto; display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px; border-top: 1px solid #eee; }
+.ctl {
+  min-width: 44px; min-height: 44px; padding: 0 12px; border-radius: 10px;
+  border: 1.5px solid #333; background: #fff; color: #111; font-size: 13.5px;
+}
+.ctl:disabled { opacity: .4; }
+.ctl.accent { border-color: #0a6cff; color: #fff; background: #0a6cff; }
+.slot-inline { display: inline-flex; }
+
+/* D-20：手機 390 寬時操作列（打亂／撤銷／重做／重設／提示／看電腦解，共 6 個控制項）
+   要一行放下，不能換行壓縮方塊區。縮小間距與左右內距，同時保持 min-height:44px
+   （CLAUDE.md §3.4 觸控熱區下限不可退讓）。400px 以下才套用，iPad 橫向不受影響。 */
+@media (max-width: 400px) {
+  .controlbar { gap: 4px; padding: 8px 8px; flex-wrap: nowrap; }
+  .controlbar .ctl { padding: 0 6px; font-size: 12px; letter-spacing: -0.2px; }
+}
+
+/* ---- 學習面板／抽屜（版型 C；game-spec.md §11.1） ---- */
+/* 手機直向：一般文件流的抽屜，收合時只剩手把列（max-height 限制＋overflow hidden，
+   不使用 position:absolute／fixed，避免蓋住方塊區，見 decision-log 備註 3）。 */
+.drawer {
+  flex: 0 0 auto; display: flex; flex-direction: column; min-height: 0; background: #fafbfc;
+  max-height: 30vh; overflow: hidden; transition: max-height .25s ease;
+}
+.drawer.expanded { max-height: 56vh; }
+.drawer.expanded .cpanel { overflow-y: auto; }
+.drawer:not(.expanded) .ctabs,
+.drawer:not(.expanded) .cpanel { display: none; }
+.drawer-handle { display: flex; align-items: stretch; min-height: 44px; border-top: 1px solid #e2e2e2; }
+.handle-tap {
+  flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 44px; cursor: pointer;
+}
+.handle-tap .drawer-label { font-size: 12px; color: #888; }
+.handle-tap .bar { width: 40px; height: 5px; border-radius: 3px; background: #ccc; margin-top: 4px; }
+.handle-tools { display: flex; align-items: center; gap: 8px; padding: 0 10px; }
+
+.switch {
+  min-height: 44px; min-width: 44px; padding: 0 12px; border-radius: 999px;
+  border: 1.5px solid #999; background: #fff; color: #555; font-size: 13px;
+}
+.switch[aria-checked="true"] { border-color: #0a6cff; color: #0a6cff; background: #eef3ff; font-weight: 700; }
+
+.ctabs { display: flex; gap: 8px; padding: 8px 12px 0; }
+.ctab { flex: 1; min-height: 44px; border-radius: 10px; border: 1.5px solid #333; background: #fff; color: #111; font-size: 13.5px; }
+.ctab.on { background: #111; color: #fff; }
+
+.cpanel { flex: 1 1 auto; overflow-y: auto; padding: 10px 12px 16px; min-height: 0; }
+
+.lesson-card {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: #fff;
+  padding: 14px 16px; overflow-y: auto; z-index: 3;
+}
+
+/* ---- 記號鍵盤（game-spec.md §11.2） ---- */
+.keypad { display: flex; flex-direction: column; gap: 10px; }
+.kp-group { display: flex; flex-direction: column; }
+.kp-caption { font-size: 12px; color: #777; margin-bottom: 4px; }
+.kp-caption-toggle {
+  align-self: flex-start; min-height: 44px; padding: 0 10px; border-radius: 8px;
+  border: 1px solid #ccc; background: #f5f5f5; color: #555; font-size: 12px;
+}
+.kp-rows { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.kp-row { display: flex; gap: 6px; }
+.kp {
+  flex: 1; min-width: 44px; min-height: 44px; border-radius: 9px;
+  border: 1.5px solid #333; background: #fafafa; color: #111;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15;
+}
+.kp-move { font-size: 15px; font-weight: 700; }
+.kp-sub { font-size: 10px; color: #666; }
+.kp.kp-mid { background: #eef3ff; border-color: #0a6cff; color: #0a3b8f; }
+.kp.kp-rot { background: #f2f2f2; border-style: dashed; border-color: #999; color: #555; }
+
+/* ---- 插槽用容器 ---- */
+.slot-block { margin-bottom: 10px; }
+.overlay-root:empty { display: none; }
+
+/* ---- 版面切換：橫向（iPad）左右兩欄；直向（手機）抽屜 ---- */
+@media (orientation: landscape) {
+  .shell { flex-direction: row; }
+  .leftcol { flex: 1 1 60%; min-width: 0; position: relative; }
+  /* D-18：iPad 橫向維持原本「貼在方塊右上角」的浮層設計（相對 .leftcol 定位，
+     視覺上落在方塊區右上角一帶；iPad 空間充裕，量測結果無重疊）。 */
+  .hint-slot {
+    position: absolute; right: 6%; top: 10%; left: auto; z-index: 5;
+    padding: 0; justify-content: flex-end;
+  }
+  .hint-slot > * { margin: 0; }
+  /* 幕僚長修正（2026-09-15）：橫向時抽屜固定展開、占滿整欄高度，只讓 .cpanel 捲動；
+     原本 .drawer.expanded 的 56vh 上限在橫向仍生效，面板被截在半高。 */
+  .drawer, .drawer.expanded {
+    flex: 1 1 40%; max-height: none; overflow: hidden;
+    border-left: 1px solid #e2e2e2; background: #fafbfc;
+  }
+  .drawer .handle-tap { display: none; }
+  .drawer .ctabs, .drawer:not(.expanded) .ctabs { display: flex; }
+  .drawer .cpanel, .drawer:not(.expanded) .cpanel { display: block; overflow-y: auto; }
+}
+
+/* 幕僚長修正 D-18b（2026-09-15）：手機直向時方塊區保底高度，不被提示卡與抽屜擠扁；
+   改由抽屜讓出空間（抽屜可縮、內容區自行捲動）。橫向維持原本兩欄版面。 */
+@media (orientation: portrait) {
+  .leftcol { flex: 1 0 auto; }
+  .cube-scene { flex: 1 0 auto; min-height: 210px; overflow: hidden; }
+  .drawer, .drawer.expanded { flex: 0 1 auto; }
+}

@@ -7,7 +7,7 @@
 | 狀態 | 已採納（G3） |
 | 日期 | 2026-09-15 |
 | 相關任務 | T-001（`docs/tickets/T-001/dispatch.md` S4、S5、S6、S7） |
-| 製作人核准 | 大方向已核准：2026-09-15 G0「求解器：自己寫」、G2「兩種示範都做」「求解器放 `src/solver/`，以搜尋節點上限控時、不讀時鐘、可重現；在 Web Worker 執行」。本檔的細部取捨（QTM 成本、無對稱縮減、節點上限數值、Blob Worker、主執行緒退回）不需另外核准，但與建議解按鈕名稱相關的部分見 §6 |
+| 製作人核准 | 大方向已核准：2026-09-15 G0「求解器：自己寫」、G2「兩種示範都做」「求解器放 `src/solver/`，以搜尋節點上限控時、不讀時鐘、可重現；在 Web Worker 執行」。本檔的細部取捨（QTM 成本、無對稱縮減、節點上限數值、Blob Worker、主執行緒退回）不需另外核准；建議解按鈕名稱已於 G3.5 拍板（見 §6） |
 | 依據 | `docs/spike/solver-spike.md`（量測）、`scratch/g3-check/`（G3 補測）、`docs/spec/game-spec.md` §7–§9 |
 
 ## 1. 背景
@@ -73,7 +73,8 @@ worker.postMessage({ type: 'init', id: 1, params: GAME_DATA.params.solver });
 |---|---|
 | 無法建立 Worker | 主 bundle 也包含 solver 模組，改在主執行緒執行（第一次使用時建表，畫面會停頓，先顯示提示文案） |
 | 建表逾時（`initTimeoutMs` 20,000） | 建議解不可用；提示改用層先法 |
-| 單次求解逾時（`solveTimeoutMs` 10,000）或 `NODE_LIMIT` | 終止並重建 Worker；本次提示改用層先法；建議解示範改為提供「改看層先法示範」 |
+| 單次求解逾時（`solveTimeoutMs` 10,000） | 終止並重建 Worker；本次提示改用層先法；建議解示範改為提供「改看層先法示範」 |
+| `NODE_LIMIT` | **不重建 Worker**（查表仍有效，補註 D-9）；本次提示改用層先法；建議解示範改為提供「改看層先法示範」 |
 
 逾時門檻皆為預設值，待 G5 實機調整。
 
@@ -105,7 +106,7 @@ worker.postMessage({ type: 'init', id: 1, params: GAME_DATA.params.solver });
 - **solver**：`twophase.js`（spike 改寫）、`lbl.js`（新寫，依賴 `engine/cube.js`）、`worker.js`。
 - **ui**：`solver-client.js` 負責建立 Worker、請求佇列、watchdog、計畫快取、退回。
 - **data**：`params.json` 的 `solver` 區塊；`lbl.json`。
-- **build**：產生 `window.SOLVER_WORKER_SRC`；主 bundle 與 Worker 字串各含一份 solver；上限：產物 < 300 KB、Worker 字串 < 100 KB。
+- **build**：產生 `window.SOLVER_WORKER_SRC`；主 bundle 與 Worker 字串各含一份 solver；上限：產物 < 400 KB（補註 D-13，原訂 300 KB）、Worker 字串 < 100 KB。
 - **tests**：`T-SOL-*`、`T-LBL-*`、`T-BUILD-02/03`、`T-UI-07/08/09/12`。
 - **決定性**：有。同一狀態（含 `orient`）必得同一解，所以同 seed＋同 action 序列（`HINT_READY`／`DEMO_READY` 的內容由求解器產生）可以重放；測試另以固定內容的 READY action 重放 engine（`T-ENG-12`）。
 - **觸控**：建表與求解在 Worker，不阻塞觸控；只有主執行緒退回時第一次建表會停頓。
@@ -127,6 +128,13 @@ worker.postMessage({ type: 'init', id: 1, params: GAME_DATA.params.solver });
 
 - 手機與 iPad 的建表時間、記憶體、`nodeLimit` 耗時：**UNKNOWN**（M-02）。
 - iOS Safari 在 `file://` 下的 Blob Worker 行為：**UNKNOWN**（有主執行緒退回）。
-- 建議解示範的按鈕名稱（「最短示範」或「建議解示範」）：**需製作人決定**（`game-spec.md` §14 第 1 題）。
+- ~~建議解示範的按鈕名稱~~：**已結案**（decision-log 2026-09-15 G3.5：製作人同意定名「建議解示範」，全面取代 G2 舊稱；`game-spec.md` §14 第 1 題、附錄 C 修訂 R-3）。本項是文案決定，不影響本 ADR 的架構決策。
 - 層先法理論最大步數：**UNKNOWN**（樣本最大 236 QTM）。
 - v0.2 若加入真正最少步，需另開 ADR（表要加 `cornerTable`、UI 文案要能說「最少步」）。
+
+
+## 補註（2026-09-15，G4 期間）
+
+- D-9：`NODE_LIMIT` 不重建 Worker，以規格 §9.6 為準。
+- D-13：主產物上限由 300 KB 放寬為 400 KB（主執行緒退回需內含求解器）。
+- 完整裁決見 `docs/reports/T-001-arch-decisions.md`。

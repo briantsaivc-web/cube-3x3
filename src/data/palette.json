@@ -1,0 +1,12 @@
+{
+  "stickers": [
+    { "id": 0, "name": "白", "hex": "#FFFFFF", "labelInk": "#111111" },
+    { "id": 1, "name": "紅", "hex": "#C41E3A", "labelInk": "#FFFFFF" },
+    { "id": 2, "name": "綠", "hex": "#009E60", "labelInk": "#FFFFFF" },
+    { "id": 3, "name": "黃", "hex": "#FFD500", "labelInk": "#111111" },
+    { "id": 4, "name": "橙", "hex": "#FF5800", "labelInk": "#111111" },
+    { "id": 5, "name": "藍", "hex": "#0051BA", "labelInk": "#FFFFFF" }
+  ],
+  "body": "#111111",
+  "highlight": "#FFFFFF"
+}

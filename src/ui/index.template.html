@@ -1,0 +1,92 @@
+<!doctype html>
+<!--
+  src/ui/index.template.html — 打包用 HTML 樣板（版型 C：學習導向；game-spec.md §11.1）
+  依分派單 T-001 S8a（X-7 空殼移交後由本段改寫，所有權見 docs/reports/T-001-S8a.md）。
+  build/bundle.js 會依序把下面本檔內文出現的五個 INJECT 標記換成實際內容：
+  CSS（styles.css、demo.css、overlay.css）、VERSION（window.GAME_VERSION）、
+  DATA（window.GAME_DATA）、WORKER（window.SOLVER_WORKER_SRC）、
+  JS（主 bundle：迷你模組註冊器＋ui/app.js 等）。
+
+  文字內容一律由 app.js／controls.js 等模組於掛載時從 window.GAME_DATA.texts 填入
+  （§11.4：UI 只呈現 state；文案集中在 texts.json，方便 game-designer 潤飾不必改本檔）。
+  只有一份 DOM（手機直向與 iPad 橫向共用，靠 CSS @media (orientation: landscape) 切版面），
+  同頁不得有重複 id（game-spec.md §11.1 差異第 5 點）。
+
+  版面：
+    .shell            版型 C 的左右兩欄（橫向）／單欄（直向）容器
+      .leftcol          狀態列 → 方塊區 → 操作列
+      #learnDrawer      學習面板（iPad：右欄常駐；手機：方塊下方抽屜）
+    [data-slot=overlay] 完成畫面等置中卡片（S8d）
+
+  插槽（分派單 §3 S8a）：data-slot="lesson-button|lesson-card|overlay|hint-button|hint|demo|solver-status"
+-->
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>魔術方塊</title>
+<!-- INJECT:CSS -->
+</head>
+<body>
+<div id="app" class="app">
+  <div class="shell">
+    <div class="leftcol">
+      <div class="statusbar" id="statusbar">
+        <div class="stat"><span class="k" id="hudTimeLabel"></span><span class="v" id="timerVal">0:00.0</span></div>
+        <div class="stat">
+          <span class="k" id="hudMovesLabel"></span>
+          <span class="v-row"><span class="v" id="moveVal">0</span><button type="button" class="qtm-note-btn" id="qtmNoteBtn" aria-expanded="false">?</button></span>
+        </div>
+        <span class="badge" id="hintBadge" hidden></span>
+      </div>
+      <div class="qtm-note-line" id="qtmNoteLine" hidden></div>
+      <div class="cube-scene">
+        <div data-cube-stage class="cube-stage"></div>
+      </div>
+      <!-- D-18：手機直向時提示浮層搬到方塊區與操作列之間的一般文件流（絕不會蓋住
+           方塊），iPad 橫向則用 styles.css 的 landscape 媒體查詢改回貼在方塊右上角
+           （見 styles.css `.hint-slot` 的說明）。 -->
+      <div class="hint-slot" data-slot="hint"></div>
+      <div class="scramble-line" id="scrambleLine" hidden></div>
+      <div class="controlbar" id="controlbar">
+        <button class="ctl" type="button" id="btnScramble"></button>
+        <button class="ctl" type="button" id="btnUndo"></button>
+        <button class="ctl" type="button" id="btnRedo"></button>
+        <button class="ctl" type="button" id="btnReset"></button>
+        <span class="slot-inline" data-slot="hint-button"></span>
+        <button class="ctl accent" type="button" id="btnDemoOpen"></button>
+      </div>
+    </div>
+    <div class="drawer" id="learnDrawer">
+      <div class="drawer-handle">
+        <span class="handle-tap" id="handleTap">
+          <span class="drawer-label" id="drawerLabel"></span>
+          <span class="bar" aria-hidden="true"></span>
+        </span>
+        <span class="handle-tools">
+          <span class="slot-inline" data-slot="lesson-button"></span>
+          <button type="button" class="switch" id="faceLabelToggle" role="switch" aria-checked="false"></button>
+        </span>
+      </div>
+      <div class="ctabs" role="tablist">
+        <button type="button" class="ctab" id="tabControls" role="tab"></button>
+        <button type="button" class="ctab" id="tabDemo" role="tab"></button>
+      </div>
+      <div class="cpanel" id="panelControls" data-cpanel="controls" role="tabpanel">
+        <div class="keypad" id="keypad" aria-label="記號鍵盤"></div>
+      </div>
+      <div class="cpanel" id="panelDemo" data-cpanel="demo" role="tabpanel" hidden>
+        <div class="slot-block" data-slot="solver-status"></div>
+        <div class="slot-block" data-slot="demo"></div>
+      </div>
+      <div class="lesson-card" data-slot="lesson-card" hidden></div>
+    </div>
+  </div>
+  <div class="overlay-root" data-slot="overlay"></div>
+</div>
+<!-- INJECT:VERSION -->
+<!-- INJECT:DATA -->
+<!-- INJECT:WORKER -->
+<!-- INJECT:JS -->
+</body>
+</html>

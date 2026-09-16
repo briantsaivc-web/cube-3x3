@@ -13,7 +13,7 @@
 | 遊戲名稱 | 魔術方塊（2026-09-15 G2 拍板；**不得使用「Rubik's」字樣與官方標誌**，該字樣為 Spin Master 註冊商標） |
 | 類型 | 經典三階魔術方塊（3x3x3）單頁網頁遊戲 |
 | 定位 | 讓手邊沒有實體方塊的人可以玩，也可以看電腦怎麼解（學習用） |
-| 玩法模式 | 單人；v0.1＝自由練習＋提示＋看電腦解（最短示範＋層先法分段示範）（2026-09-15 拍板）；無連線、無帳號、無金流 |
+| 玩法模式 | 單人；v0.1＝自由練習＋提示＋看電腦解（建議解示範＋層先法分段示範）（2026-09-15 拍板）；無連線、無帳號、無金流 |
 | 計步規則 | **QTM**（2026-09-15 拍板）：外層 90°＝1 步、180°＝2 步；中層 M/E/S 90°＝2 步、180°＝4 步；整顆旋轉與拖曳視角＝0 步（G2 拍板） |
 | 3D 畫法 | CSS 3D transforms（2026-09-15 拍板）；不用 WebGL、不用 Canvas 3D 函式庫 |
 | 求解器 | 自寫 Kociemba 兩階段法＋自寫層先法產生器（2026-09-15 拍板），放 `src/solver/`，以搜尋節點上限控時、不讀時鐘、結果可重現，於 Web Worker 執行；不得複製或內嵌第三方求解器原始碼；畫面稱「建議解」，未經驗證不得稱「最佳解」 |
@@ -57,13 +57,13 @@ docs/changelog/   CHANGELOG.md
 
 ## 4. 指令
 
-（2026-09-13 由 game-engineer 於 T-001 S5 回填；依據 `package.json` scripts。全部只需 Node ≥ 18，`test:ui` 另需 `playwright` 套件與 Chromium。）
+（2026-09-15 幕僚長依本案 `package.json` 與 T-001 實測更新。需 Node ≥ 22（`node --test` 使用萬用字元路徑；製作人電腦的 Node 版本待確認），`test:ui` 另需 `playwright` 套件與 Chromium。）
 
-- 建置：`npm run build`（執行 `node build/bundle.js`，把 `src/` 打包成根目錄 `index.html`；決定性、零外部資源、< 300 KB）
-- 測試：`npm test`（＝ `npm run test:engine && npm run build && npm run test:ui`）
-  - `npm run test:engine`：`node --test "tests/engine/**/*.test.js"`（純 Node，零套件；含 `T-BUILD-*`）
-  - `npm run test:ui`：`node tests/ui/smoke.spec.js`（Playwright Chromium，手機直向 390×844 與 iPad 橫向 1194×834 各走完一局，截圖到 `docs/qa/shots/`；找不到 `playwright` 或瀏覽器時印出可讀錯誤並以非 0 結束。安裝：`npm i -D playwright`，瀏覽器位置由 `PLAYWRIGHT_BROWSERS_PATH` 指定或 `npx playwright install chromium`）
-- 本機預覽：`npm run build` 後直接用瀏覽器開 `index.html`（支援 `file://`，斷網可玩）；或 `npm run preview` 起 `http://localhost:8080`（Node 內建 http，給 iPad／手機同網段測試用）
+- 建置：`npm run build`（執行 `node build/bundle.js`，把 `src/` 打包成根目錄 `index.html`；決定性、零外部資源；主產物 < 400 KB、Worker 字串 < 100 KB，見 D-13）
+- 測試：`npm test`（＝ `npm run test:engine && npm run build && npm run test:ui`；雲端實測合計約 7–8 分鐘）
+  - `npm run test:engine`：`node --test "tests/engine/**/*.test.js"`（純 Node，零套件；約 3 分鐘，主要是 1,000 局求解測試）
+  - `npm run test:ui`：`node tests/ui/smoke.spec.js`（Playwright Chromium，手機直向 390×844 與 iPad 橫向 1194×834；約 4 分鐘；截圖到 `docs/qa/shots/`；找不到 `playwright` 或瀏覽器時印出可讀錯誤並以非 0 結束。安裝：`npm i -D playwright` 後 `npx playwright install chromium`）
+- 本機預覽：`npm run build` 後直接用瀏覽器開 `index.html`（支援 `file://`，斷網可玩）。本案沒有 `npm run preview`；要給同網段的 iPad／手機測試，可用 `python -m http.server 8080` 後開 `http://<電腦 IP>:8080/`。
 
 ## 5. 所有角色共同的工作紀律
 

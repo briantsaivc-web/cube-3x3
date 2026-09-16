@@ -1,0 +1,30 @@
+{
+  "firstLayerColor": 0,
+  "segments": ["hold", "cross", "corners", "middle", "yellowCross", "yellowFace", "yellowCorners", "yellowEdges"],
+  "formulas": {
+    "crossDown":    { "alg": "F2",                            "name": "白邊翻上來",
+                      "desc": "白色邊塊已經在正下方對好位置，前層轉半圈就把它送到上面。" },
+    "crossFlip":    { "alg": "D R F' R'",                     "name": "白邊翻正",
+                      "desc": "白色邊塊在下層但白色朝前時用，把它翻正再送上去。" },
+    "cornerDrop":   { "alg": "R' D' R",                       "name": "角塊拿下來",
+                      "desc": "把放錯位置或方向的白色角塊先拿到下層，等一下再重新放。" },
+    "cornerInsert": { "alg": "R' D' R D",                     "name": "角塊放上去",
+                      "desc": "白色角塊在右前下方時，重複做幾次，它就會轉進右前上方的正確位置。" },
+    "edgeRight":    { "alg": "U R U' R' U' F' U F",           "name": "中層邊放右邊",
+                      "desc": "把上層前面的邊塊放進右前方的中層位置。" },
+    "edgeLeft":     { "alg": "U' L' U L U F U' F'",           "name": "中層邊放左邊",
+                      "desc": "把上層前面的邊塊放進左前方的中層位置。" },
+    "edgeKickOut":  { "alg": "U R U' R' U' F' U F",           "name": "把卡住的邊塊換出來",
+                      "desc": "中層有邊塊放錯時，先把它換到上層，之後再放回正確位置。" },
+    "yellowCross":  { "alg": "F R U R' U' F'",                "name": "黃十字公式",
+                      "desc": "做一到三次，頂面就會出現黃色十字。" },
+    "sune":         { "alg": "R U R' U R U2 R'",              "name": "小魚公式",
+                      "desc": "把頂面角塊的黃色轉到上面，重複到整個頂面都是黃色。" },
+    "aPerm":        { "alg": "R' F R' B2 R F' R' B2 R2",      "name": "換角公式",
+                      "desc": "左前上方的角塊不動，其他三個頂角輪流換位置。" },
+    "uPerm":        { "alg": "R2 U R U R' U' R' U' R' U R'",  "name": "換邊公式",
+                      "desc": "後面的頂邊不動，其他三個頂邊輪流換位置。" }
+  },
+  "headlightFace": "B",
+  "guards": { "cross": 8, "corners": 12, "cornerInsert": 5, "middle": 16, "yellowCross": 3, "sune": 6, "aPerm": 3, "uPerm": 3 }
+}

@@ -1,0 +1,125 @@
+/* src/ui/demo.css — 提示浮層與示範分頁樣式（game-spec.md §9.1、§9.4、§2.3、§2.4） */
+/* 依分派單 T-001 S8c（X-7 空殼移交後由本段改寫）。
+   共用類別沿用 src/ui/styles.css 既有的 .ctl（含 .accent）按鈕樣式（≥44×44px）；
+   本檔只補提示／示範專屬的版面與顏色，不重複定義按鈕基礎樣式。 */
+
+/* ---- 提示浮層（hint 插槽；方塊區右上角） ---- */
+.hint-prompt {
+  max-width: min(70vw, 240px);
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .92);
+  border: 1px solid #ddd;
+  font-size: 12px;
+  color: #777;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+}
+
+.hint-card, .wait-card {
+  position: relative;
+  max-width: min(78vw, 260px);
+  padding: 10px 30px 10px 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1.5px solid #0a6cff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .14);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.wait-card { border-color: #999; padding-right: 12px; text-align: center; }
+.wait-msg { color: #444; margin-bottom: 6px; }
+.wait-card .ctl { margin-top: 6px; width: 100%; }
+
+/* S11／B-3：可點範圍放大到 44×44（CLAUDE.md §3 第 4 條），視覺上仍是小的 ×；
+   卡片右側內距同步加寬，避免 × 蓋住文字。 */
+.hint-card { padding-right: 44px; }
+.hint-close {
+  position: absolute; top: 0; right: 0;
+  min-width: 44px; min-height: 44px;
+  border-radius: 999px; border: none; background: transparent;
+  font-size: 18px; line-height: 1; color: #999; cursor: pointer;
+}
+.hint-move { font-size: 16px; font-weight: 700; color: #0a3b8f; margin-bottom: 4px; }
+.hint-explain { color: #333; margin-bottom: 6px; }
+.hint-note { font-size: 11px; color: #999; }
+.hint-error, .demo-error {
+  border-color: #d0332f; color: #8a1f1c; background: #fdeceb;
+}
+
+.solver-notice {
+  padding: 8px 10px; border-radius: 8px; margin-bottom: 8px;
+  background: #fff3cd; color: #8a6100; border: 1px solid #f0c96a;
+  font-size: 12.5px; line-height: 1.4;
+}
+
+.progress-bar {
+  height: 6px; border-radius: 999px; background: #eee; overflow: hidden; margin-bottom: 6px;
+}
+.progress-fill { height: 100%; background: #0a6cff; transition: width .15s linear; }
+
+/* ---- 示範分頁 ---- */
+.demo-root { display: flex; flex-direction: column; gap: 10px; }
+
+.demo-kind-row { display: flex; gap: 8px; }
+.demo-kind-btn { flex: 1; font-size: 13px; }
+.demo-kind-btn.on { border-color: #0a6cff; background: #eaf2ff; color: #0a3b8f; font-weight: 700; }
+
+.demo-pick { display: flex; flex-direction: column; gap: 8px; }
+.demo-note { font-size: 12.5px; color: #555; line-height: 1.5; }
+.demo-note-sub { color: #888; font-size: 11.5px; }
+.demo-error { padding: 8px 10px; border-radius: 8px; border-width: 1px; border-style: solid; }
+
+.demo-player { display: flex; flex-direction: column; gap: 8px; }
+.demo-header { font-size: 15px; font-weight: 700; }
+.demo-progress { font-size: 12px; color: #777; font-variant-numeric: tabular-nums; }
+.demo-explain { font-size: 12.5px; color: #333; background: #f2f6ff; border-radius: 8px; padding: 6px 10px; }
+
+.token-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.token-row { display: flex; gap: 6px; padding: 2px; }
+.token-chip {
+  flex: 0 0 auto; min-width: 40px; padding: 4px 6px; border-radius: 8px;
+  border: 1.5px solid #ddd; text-align: center; opacity: .55;
+}
+.token-chip.done { opacity: .35; }
+.token-chip.next { opacity: 1; border-color: #0a6cff; background: #eaf2ff; box-shadow: 0 0 0 2px rgba(10, 108, 255, .18); }
+.token-move { font-size: 14px; font-weight: 700; }
+.token-step { font-size: 9.5px; color: #777; white-space: nowrap; }
+
+.pause-card {
+  padding: 10px 12px; border-radius: 10px; background: #eaf2ff; border: 1.5px solid #0a6cff;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.pause-msg { font-size: 12.5px; color: #0a3b8f; line-height: 1.5; }
+
+.demo-controls { display: flex; gap: 6px; flex-wrap: wrap; }
+.demo-controls .ctl { flex: 1 1 auto; min-width: 44px; font-size: 12.5px; padding: 0 8px; }
+
+.demo-speed-row { display: flex; gap: 6px; }
+.speed-btn { flex: 1; font-size: 12.5px; }
+.speed-btn.on { border-color: #0a6cff; background: #eaf2ff; color: #0a3b8f; font-weight: 700; }
+
+.segment-list { display: flex; flex-direction: column; gap: 6px; }
+.segment-row {
+  min-height: 44px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid #e2e2e2;
+  cursor: pointer; display: flex; flex-direction: column; gap: 3px; justify-content: center;
+}
+.segment-row.done { opacity: .6; }
+.segment-row.skip { opacity: .5; }
+.segment-row.current { border-color: #0a6cff; background: #f5f9ff; }
+.segment-row.future { opacity: .55; }
+.seg-name { font-size: 13px; font-weight: 700; }
+.seg-desc { font-size: 11.5px; color: #555; line-height: 1.4; }
+.seg-steps { font-size: 11px; color: #0a6cff; font-weight: 700; }
+.seg-note { font-size: 11px; color: #999; }
+
+.formula-block {
+  margin-top: 4px; padding: 6px 8px; border-radius: 8px; background: #fff;
+  border: 1px dashed #0a6cff;
+}
+.formula-name { font-size: 12px; font-weight: 700; color: #0a3b8f; }
+.formula-use { font-size: 11px; color: #666; margin-top: 2px; }
+
+@media (orientation: landscape) {
+  .hint-card, .wait-card, .hint-prompt { max-width: 220px; }
+}

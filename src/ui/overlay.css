@@ -1,0 +1,90 @@
+/* src/ui/overlay.css — 完成畫面、最佳紀錄徽章、首次教學與記號小教室卡片樣式 */
+/* 依分派單 T-001 S8d（game-spec.md §6.3、§6.4、§11.3、§11.4）。 */
+/*
+  本檔管的兩個插槽：
+    [data-slot="overlay"]      置中卡片（完成畫面；遊戲畫面上方加半透明遮罩，§11.4）
+    [data-slot="lesson-card"]  學習面板內的教學／記號小教室卡片（不加遮罩、不蓋方塊區，§11.3）
+    [data-slot="lesson-button"] 面板頂列／手把列的「記號說明」按鈕（§11.2、§11.3）
+
+  覆寫說明：`.lesson-card` 原本在 src/ui/styles.css（S8a）是 position:absolute 覆蓋整個
+  #learnDrawer（含手把列與分頁列），但 #learnDrawer 本身沒有設 position，會讓卡片以 #app
+  為定位基準蓋住整個畫面（含方塊區），違反「不蓋住方塊區」。本檔改用一般文件流（flex 子項），
+  並用 order 把卡片排在手把列之後、分頁列之前，不需要修改 styles.css／index.template.html
+  （僅有的兩個檔案 S8d 不可碰）。
+
+  卡片與分頁內容的關係（§11.3）：只有記號小教室（L 步，無論在首次教學中或「記號說明」
+  重開）才由 tutorial.js 把 .ctabs／#panelControls／#panelDemo 設為 hidden、卡片獨佔面板；
+  一般教學步（T0～T4）卡片與目前分頁內容並存（卡片在上、分頁內容在下可捲動），因為 T2
+  明確要玩家去看「操作」分頁的按鈕，見 tutorial.js 的 syncPanelVisibilityForStep 與
+  S8d 回報「未預期發現」。
+*/
+
+/* ---- 完成畫面（overlay 插槽；置中卡片＋半透明遮罩，§11.4） ---- */
+.overlay-mask {
+  position: absolute; inset: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; background: rgba(20, 22, 26, .5);
+}
+.overlay-card {
+  width: min(92vw, 380px); max-height: 84vh; overflow-y: auto;
+  background: #fff; border-radius: 16px; padding: 22px 22px 20px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .28);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.result-headline { margin: 0; font-size: 19px; font-weight: 700; }
+.result-summary { margin: 0; font-size: 15px; color: #333; line-height: 1.5; }
+.result-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.result-note { margin: 0; font-size: 12.5px; color: #888; line-height: 1.5; }
+.result-actions { margin-top: 6px; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+/* MJ-2（D-24）：完成畫面的本機最佳紀錄 */
+.result-best { margin: 0; font-size: 13px; color: #555; line-height: 1.5; font-variant-numeric: tabular-nums; }
+
+/* 沿用 styles.css 的 .badge（提示徽章）外觀，另加兩個色調變化 */
+.badge.badge-demo { background: #e7f0ff; color: #0a3b8f; border-color: #a9c8ff; }
+.badge.badge-new { background: #e8f9ee; color: #106b3a; border-color: #8fdcae; }
+
+/* ---- D-17：示範中的完成摘要卡（掛在 .cube-scene 上緣，不遮擋示範播放器操作） ---- */
+/* 比照 styles.css 的 .hint-slot 作法：外層 pointer-events:none，只有卡片本身可互動
+   （這裡卡片沒有按鈕，純資訊，但保留同款寫法以防日後加互動元素）。 */
+.demo-result-slot {
+  position: absolute; left: 4%; right: 4%; top: 3%; z-index: 6;
+  display: flex; justify-content: center; pointer-events: none;
+}
+.demo-result-slot > * { pointer-events: auto; }
+.demo-result-card {
+  max-width: min(86vw, 320px); padding: 8px 14px; border-radius: 10px;
+  background: rgba(255, 255, 255, .96); border: 1.5px solid #0a6cff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .14); text-align: center;
+}
+.demo-result-headline { font-size: 13.5px; font-weight: 700; color: #0a3b8f; }
+.demo-result-summary { font-size: 12px; color: #444; margin-top: 2px; }
+
+/* ---- 「記號說明」按鈕（lesson-button 插槽） ---- */
+.notation-help-btn { white-space: nowrap; }
+
+/* ---- 教學／記號小教室卡片（lesson-card 插槽） ---- */
+/* #learnDrawer 的手把列排最前面，卡片排在它之後、分頁列（預設 order:0）之前，
+   這樣卡片和分頁列並存時（一般教學步）卡片在上，鍵盤在下可捲動，不會互相蓋住。 */
+#learnDrawer .drawer-handle { order: -2; }
+.lesson-card {
+  position: static; z-index: auto; order: -1;
+  flex: 0 0 auto; max-height: 46vh; min-height: 0; overflow-y: auto;
+  background: #fff; padding: 14px 16px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  border-bottom: 1px solid #eee;
+}
+.lesson-meta { font-size: 12px; color: #888; }
+.lesson-meta-primary { font-weight: 600; color: #666; }
+.lesson-meta-secondary { color: #0a6cff; font-weight: 700; }
+.lesson-title { margin: 2px 0 0; font-size: 16px; font-weight: 700; }
+.lesson-body { margin: 0; font-size: 14px; line-height: 1.65; color: #222; }
+.lesson-explain {
+  margin: 0; font-size: 13.5px; line-height: 1.6; color: #0a3b8f;
+  background: #eef3ff; border: 1px solid #cfe0ff; border-radius: 10px; padding: 10px 12px;
+}
+.lesson-actions {
+  margin-top: auto; padding-top: 8px; display: flex; flex-wrap: wrap; gap: 8px;
+}
+.lesson-btn { flex: 0 0 auto; }
+.lesson-next { order: 5; }
+.lesson-skip-all, .lesson-close { order: 6; margin-left: auto; }
