@@ -10,6 +10,11 @@
 //   - 計畫快取（鍵＝home 貼紙字串，值＝剩下的 home 記號序列）。
 //   - 退回：Worker 建不起來 → mainThread；建表逾時或出錯 → failed；
 //           求解逾時或 NODE_LIMIT → 本次改用層先法（提示）或回報建議解不可用（建議解示範）。
+//   - S13／m-3（D-35）：主執行緒路徑與 Worker 路徑一致——求解器或層先法丟例外時以 INTERNAL 結束；
+//     主執行緒的 job 也有 solveTimeoutMs watchdog（逾時以 TIMEOUT 退回，與 Worker 路徑相同）；
+//     requestHint／requestDemo 一律回傳 Promise，不會同步丟例外，所以等待卡的「取消」在所有路徑都有效。
+//     注意：主執行緒上的計算是同步的，watchdog 無法中斷一次正在進行的計算；真正的計算量上限仍是
+//     params.solver 的搜尋節點上限（NODE_LIMIT）。watchdog 保護的是「job 排了程卻一直沒有結果」的情形。
 //
 // deps（全部由外部注入，Node 測試可用假 Worker 與假時鐘）：
 //   createWorker(handlers) → {postMessage(msg), terminate()}
@@ -237,17 +242,26 @@ function createSolverClient(deps) {
   function finish(job, action) {
     if (job.done) return;
     job.done = true;
+    if (job.mainWatch !== null && job.mainWatch !== undefined) {
+      clearTimer(job.mainWatch);
+      job.mainWatch = null;
+    }
     if (current === job) current = null;
     job.resolve(action);
   }
 
   // ---- 主執行緒上的計算 ----
+  // S13／m-3：一律回傳 action、不丟例外（例外視同 Worker 端的 INTERNAL）。
   function lblOnMain(job) {
-    var parsed = twophase.fromStickerColors(job.stickers);
-    if (!parsed.ok) return failAction(job, 'INVALID_STATE');
-    var r = lbl.generateLbl(job.stickers.slice(), lblConfig);
-    if (r.error) return failAction(job, r.error);
-    return actionFromLbl(job, r);
+    try {
+      var parsed = twophase.fromStickerColors(job.stickers);
+      if (!parsed.ok) return failAction(job, 'INVALID_STATE');
+      var r = lbl.generateLbl(job.stickers.slice(), lblConfig);
+      if (r.error) return failAction(job, r.error);
+      return actionFromLbl(job, r);
+    } catch (e) {
+      return failAction(job, 'INTERNAL');
+    }
   }
 
   // 建議解不可用時的退回（§9.6）：提示與層先法示範改在主執行緒跑層先法；建議解示範回報不可用
@@ -288,12 +302,29 @@ function createSolverClient(deps) {
     acceptSolve(job, r.names);
   }
 
+  // S13／m-3：任何例外都以 INTERNAL 結束這個 job（與 Worker 路徑 onWorkerMessage 的 try/catch 一致）。
   function runOnMain(job) {
-    if (job.req === 'lbl') {
-      finish(job, lblOnMain(job));
-    } else {
-      solveOnMain(job);
+    try {
+      if (job.req === 'lbl') {
+        finish(job, lblOnMain(job));
+      } else {
+        solveOnMain(job);
+      }
+    } catch (e) {
+      finish(job, failAction(job, 'INTERNAL'));
     }
+  }
+
+  // S13／m-3：主執行緒 job 的 watchdog（對應 Worker 路徑的 onSolveTimeout）。
+  function armMainWatch(job) {
+    if (job.done || (job.mainWatch !== null && job.mainWatch !== undefined)) return;
+    job.mainWatch = setTimer(function () {
+      job.mainWatch = null;
+      if (job.done) return;
+      var qi = queue.indexOf(job);
+      if (qi >= 0) queue.splice(qi, 1);
+      fallback(job, 'TIMEOUT');
+    }, solverParams.solveTimeoutMs);
   }
 
   // 主執行緒模式：一次排程一個 job，讓 UI 先有機會畫出等待卡片與提示文案
@@ -303,10 +334,15 @@ function createSolverClient(deps) {
     if (queue.length === 0) return;
     mainTimer = setTimer(function () {
       mainTimer = null;
-      var job = queue.shift();
-      if (job && !job.done) runOnMain(job);
-      pumpMain();
+      try {
+        var job = queue.shift();
+        if (job && !job.done) runOnMain(job);
+      } finally {
+        pumpMain(); // S13／m-3：即使本輪出錯，也繼續處理後面的 job
+      }
     }, 0);
+    // 先登記排程、再登記 watchdog（真實計時器依時間排序，順序不影響；只是讓登記順序與預期執行順序一致）
+    for (var i = 0; i < queue.length; i++) armMainWatch(queue[i]);
   }
 
   function acceptSolve(job, viewMoves) {
@@ -502,7 +538,28 @@ function createSolverClient(deps) {
     boot();
   }
 
+  // S13／m-3：submit 在任何情況都回傳 Promise、不同步丟例外；否則呼叫端（hint-view／demo-player）
+  // 收不到結果，state 會停在等待中，而 current 尚未設定，「取消」也無從作用。
+  // 例外發生在本次 job 建立之後：結束這個 job（INTERNAL；已結束則維持原結果）並回傳它的 Promise；
+  // 發生在 job 建立之前：回傳 INTERNAL 的失敗 action。
   function submit(state, req) {
+    var ref = { job: null };
+    try {
+      return submitInner(state, req, ref);
+    } catch (e) {
+      var job = ref.job;
+      if (job === null) {
+        return Promise.resolve(failAction({ req: req, version: state ? state.version : null }, 'INTERNAL'));
+      }
+      var qi = queue.indexOf(job);
+      if (qi >= 0) queue.splice(qi, 1);
+      if (job.promise === null) return Promise.resolve(failAction(job, 'INTERNAL'));
+      finish(job, failAction(job, 'INTERNAL'));
+      return job.promise;
+    }
+  }
+
+  function submitInner(state, req, ref) {
     if (current !== null) cancel();
     var input = engine.solverInput(state);
     var job = {
@@ -513,8 +570,11 @@ function createSolverClient(deps) {
       home: state.home.slice(),
       done: false,
       retried: false,
-      resolve: null
+      resolve: null,
+      promise: null,
+      mainWatch: null
     };
+    ref.job = job;
     // D-2：已復原不送請求
     if (engine.isSolvedNow(state)) return Promise.resolve(failAction(job, 'ALREADY_SOLVED'));
     if (req !== 'lbl') {
@@ -528,6 +588,7 @@ function createSolverClient(deps) {
       return Promise.resolve(lblOnMain(job));
     }
     var p = new Promise(function (resolve) { job.resolve = resolve; });
+    job.promise = p;
     current = job;
     queue.push(job);
     if (!started) start();
@@ -585,6 +646,12 @@ function createSolverClient(deps) {
       mainTimer = null;
     }
     inFlight = null;
+    queue.forEach(function (job) {
+      if (job.mainWatch !== null && job.mainWatch !== undefined) {
+        clearTimer(job.mainWatch);
+        job.mainWatch = null;
+      }
+    });
     queue = [];
   }
 

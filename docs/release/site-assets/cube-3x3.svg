@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600" role="img" aria-labelledby="title desc">
+<title id="title">魔術方塊</title>
+<desc id="desc">深藍背景中懸浮的原創三階魔術方塊插畫，白、黃、紅、橙、藍、綠六色貼紙錯落分布</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop stop-color="#10213c"/>
+    <stop offset="1" stop-color="#1a1f3c"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="50%" cy="38%" r="60%">
+    <stop stop-color="#5a8bff" stop-opacity=".22"/>
+    <stop offset="1" stop-color="#5a8bff" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="shadow" cx="50%" cy="50%" r="50%">
+    <stop stop-color="#02040d" stop-opacity=".55"/>
+    <stop offset="1" stop-color="#02040d" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="960" height="600" fill="url(#bg)"/>
+<ellipse cx="480.0" cy="216.0" rx="460" ry="320" fill="url(#glow)"/>
+<ellipse cx="480.0" cy="489.5" rx="212.8" ry="26.0" fill="url(#shadow)"/>
+
+<g>
+  <!-- top face -->
+  <polygon points="480.00,241.50 277.35,124.50 480.00,7.50 682.65,124.50" fill="#d8d6cc" stroke="#0b1426" stroke-width="3"/>
+  <polygon points="480.00,237.99 418.53,202.50 480.00,167.01 541.47,202.50" fill="#f2f1e9" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="547.55,198.99 486.08,163.50 547.55,128.01 609.02,163.50" fill="#f2f1e9" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="615.10,159.99 553.63,124.50 615.10,89.01 676.57,124.50" fill="#3f7fe0" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="412.45,198.99 350.98,163.50 412.45,128.01 473.92,163.50" fill="#f2f1e9" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="480.00,159.99 418.53,124.50 480.00,89.01 541.47,124.50" fill="#f2f1e9" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="547.55,120.99 486.08,85.50 547.55,50.01 609.02,85.50" fill="#f2f1e9" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="344.90,159.99 283.43,124.50 344.90,89.01 406.37,124.50" fill="#f2c94c" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="412.45,120.99 350.98,85.50 412.45,50.01 473.92,85.50" fill="#f2f1e9" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="480.00,81.99 418.53,46.50 480.00,11.01 541.47,46.50" fill="#f2f1e9" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+  <polygon points="480.00,241.50 277.35,124.50 480.00,7.50 682.65,124.50" fill="url(#glow)" opacity=".25"/>
+
+  <!-- front (right-facing) face -->
+  <polygon points="480.00,241.50 682.65,124.50 682.65,358.50 480.00,475.50" fill="#b5442f" stroke="#0b1426" stroke-width="3"/>
+  <polygon points="483.04,243.25 544.51,207.76 544.51,278.75 483.04,314.24" fill="#e0503a" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="483.04,321.25 544.51,285.76 544.51,356.75 483.04,392.24" fill="#e0503a" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="483.04,399.25 544.51,363.76 544.51,434.75 483.04,470.24" fill="#f2c94c" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="550.59,204.25 612.06,168.76 612.06,239.75 550.59,275.24" fill="#e0503a" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="550.59,282.25 612.06,246.76 612.06,317.75 550.59,353.24" fill="#e0503a" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="550.59,360.25 612.06,324.76 612.06,395.75 550.59,431.24" fill="#e0503a" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="618.14,165.25 679.61,129.77 679.61,200.75 618.14,236.24" fill="#f08a3c" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="618.14,243.25 679.61,207.77 679.61,278.75 618.14,314.24" fill="#e0503a" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="618.14,321.25 679.61,285.76 679.61,356.75 618.14,392.24" fill="#e0503a" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+  <polygon points="480.00,241.50 682.65,124.50 682.65,358.50 480.00,475.50" fill="rgba(0,0,0,0.22)" opacity=".12"/>
+
+  <!-- side (left-facing) face -->
+  <polygon points="480.00,241.50 277.35,124.50 277.35,358.50 480.00,475.50" fill="#2c5aa8" stroke="#0b1426" stroke-width="3"/>
+  <polygon points="476.96,243.25 415.49,207.76 415.49,278.75 476.96,314.24" fill="#4caf6e" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="476.96,321.25 415.49,285.76 415.49,356.75 476.96,392.24" fill="#3f7fe0" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="476.96,399.25 415.49,363.76 415.49,434.75 476.96,470.24" fill="#3f7fe0" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="409.41,204.25 347.94,168.76 347.94,239.75 409.41,275.24" fill="#3f7fe0" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="409.41,282.25 347.94,246.76 347.94,317.75 409.41,353.24" fill="#3f7fe0" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="409.41,360.25 347.94,324.76 347.94,395.75 409.41,431.24" fill="#3f7fe0" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="341.86,165.25 280.39,129.77 280.39,200.75 341.86,236.24" fill="#3f7fe0" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="341.86,243.25 280.39,207.77 280.39,278.75 341.86,314.24" fill="#3f7fe0" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="341.86,321.25 280.39,285.76 280.39,356.75 341.86,392.24" fill="#f2f1e9" stroke="#0b1426" stroke-width="2" stroke-linejoin="round"/>
+  <polygon points="480.00,241.50 277.35,124.50 277.35,358.50 480.00,475.50" fill="rgba(0,0,0,0.22)" opacity=".28"/>
+</g>
+
+<g fill="#ffe2a0">
+  <path d="M180 130l5 14 14 5-14 5-5 14-5-14-14-5 14-5z"/>
+  <circle cx="140" cy="185" r="3"/>
+  <circle cx="800" cy="470" r="3"/>
+  <path d="M792 150l4 11 11 4-11 4-4 11-4-11-11-4 11-4z" opacity=".85"/>
+</g>
+</svg>

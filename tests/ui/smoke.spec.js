@@ -4,7 +4,8 @@
 // 依 CLAUDE.md §4：`npm run test:ui` = `node tests/ui/smoke.spec.js`；找不到 playwright 或
 // 瀏覽器時印出可讀錯誤並以非 0 結束。手機直向 390×844 與 iPad 橫向 1194×834 各跑一次
 // T-UI-01～T-UI-28（含 D-12「等提示時轉視角」；T-UI-24～28 為 S11 新增），截圖存 docs/qa/shots/。
-// （T-UI-29、T-UI-30 是 UI 純邏輯的 Node 單元測試，在 tests/engine/ui-logic.test.js。）
+// （T-UI-29、T-UI-30 是 UI 純邏輯的 Node 單元測試，在 tests/engine/ui-logic.test.js；
+//   S13 的 T-UI-34 在 tests/engine/gesture.test.js。T-UI-31～33、35～37 見 checks4.js、checks5.js。）
 //
 // 依 docs/tickets/T-001/dispatch.md §3 S9：本檔不得修改 src/；缺測試掛鉤（window.__cubeTest）
 // 或 DOM 選擇器時，回報而不是自己動手改 src/（見本檔各 check 的容錯與 docs/reports/T-001-S9.md）。
@@ -47,6 +48,8 @@ var lbl = require(path.join(ROOT, 'src', 'data', 'lbl.json'));
 var checks1 = require('./checks.js');
 var checks2 = require('./checks2.js');
 var checks3 = require('./checks3.js'); // S11：架構審查退件修正的回歸測試（T-UI-24～T-UI-28）
+var checks4 = require('./checks4.js'); // S12：G4.5 外部審查採納項與自查項（T-UI-31～T-UI-33）
+var checks5 = require('./checks5.js'); // S13：G5 本版修正 D-35（T-UI-35～T-UI-37）
 
 var VIEWPORTS = [
   { name: 'phone', width: 390, height: 844 },
@@ -118,7 +121,13 @@ async function runViewport(browser, vp, results) {
     ['T-UI-25', checks3.checkT25],
     ['T-UI-26', checks3.checkT26],
     ['T-UI-27', checks3.checkT27],
-    ['T-UI-28', checks3.checkT28]
+    ['T-UI-28', checks3.checkT28],
+    ['T-UI-31', checks4.checkT31],
+    ['T-UI-32', checks4.checkT32],
+    ['T-UI-33', checks4.checkT33],
+    ['T-UI-35', checks5.checkT35],
+    ['T-UI-36', checks5.checkT36],
+    ['T-UI-37', checks5.checkT37]
   ];
 
   for (var i = 0; i < steps.length; i++) {

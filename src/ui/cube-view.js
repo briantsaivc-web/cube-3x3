@@ -291,7 +291,12 @@ function mount(ctx) {
 
   function render() {
     teardownPendingLayer();
-    if (!dragging) cubeWorld.style.transform = '';
+    if (!dragging) {
+      // S12（N-1）：整顆旋轉動畫留下的 transition 必須先關掉，否則清除 transform 時
+      // 方塊會以反方向再轉一次（顏色已換成轉完的狀態），畫面出現「倒轉」。
+      cubeWorld.style.transition = 'none';
+      cubeWorld.style.transform = '';
+    }
     paint(currentPaintSource());
   }
 
@@ -357,19 +362,31 @@ function mount(ctx) {
     return withBusy(new Promise(function (resolve) { setTimeout(resolve, ms); }));
   }
 
+  // S12（G4.5 E-2）：世代計數器。clearPreview() 或新的 previewTurn() 會讓舊的動畫回呼作廢，
+  // 避免過期回呼把示範貼紙畫回畫面（跳過教學後畫面與 state 不一致）。
+  var previewGen = 0;
+
   function previewTurn(baseStickers, viewMove, ms) {
+    var myGen = ++previewGen;
     previewActive = true;
     previewStickers = baseStickers.slice();
     paint(previewStickers);
-    return turn(viewMove, ms).then(function () {
+    // S12（G4.5 E-1）：整顆旋轉（x／y／z）要轉整個方塊，不能用局部轉層（轉軸上的兩個中心塊不在
+    // layerStickers 內，會留在原地）。
+    var isRotation = engine.kind(viewMove) === 'rotation';
+    var anim = isRotation ? rotateWholeCube(viewMove, ms) : turn(viewMove, ms);
+    return anim.then(function () {
+      if (myGen !== previewGen || !previewActive) return;
       previewStickers = engine.applyMove(baseStickers, viewMove);
       teardownPendingLayer();
+      cubeWorld.style.transition = 'none';
       cubeWorld.style.transform = '';
       paint(previewStickers);
     });
   }
 
   function clearPreview() {
+    previewGen++;
     previewActive = false;
     previewStickers = null;
     render();

@@ -1,0 +1,26 @@
+{
+  "E2": {
+    "lessonStep": "記號小教室 1／7",
+    "mismatchedStickersAfterSkip": 12,
+    "errs": [],
+    "mismatchAfterPressingR": 0
+  },
+  "E1": {
+    "stickersInTurnGroup": 52,
+    "rCenterInGroup": false,
+    "lCenterInGroup": false,
+    "fCenterInGroup": true,
+    "lessonStep": "記號小教室 6／7",
+    "errs": []
+  },
+  "E3": {
+    "framesCaptured": 25,
+    "firstFrameEqualsFinalScrambled": false,
+    "anyEarlyFrameEqualsFinal": false,
+    "firstMatchIndex": -1,
+    "errs": []
+  },
+  "S1": {
+    "hudBeforeDemo": "0"
+  }
+}

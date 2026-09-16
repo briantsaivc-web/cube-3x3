@@ -134,7 +134,15 @@ function mount(ctx) {
       cancelBtn.type = 'button';
       cancelBtn.className = 'ctl';
       cancelBtn.textContent = texts.buttons.cancel;
-      cancelBtn.addEventListener('click', function () { ctx.solver.cancel(); });
+      // S13／m-3（D-35）：client 已沒有等待中的請求（例如先前的結果因例外沒送出）但畫面仍在等待時，
+      // 直接以 CANCELLED 結束等待，確保「取消」在所有路徑都有效；client 有請求時行為不變。
+      cancelBtn.addEventListener('click', function () {
+        if (ctx.solver.cancel()) return;
+        var st = ctx.getState();
+        var fail = { type: 'HINT_FAILED', payload: { version: st.version, code: 'CANCELLED' } };
+        if (engine.canApply(st, fail, ctx.data)) ctx.dispatch(fail);
+        render();
+      });
       waitCard.appendChild(cancelBtn);
 
       hintSlotEl.appendChild(waitCard);

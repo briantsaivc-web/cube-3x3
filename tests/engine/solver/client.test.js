@@ -10,6 +10,8 @@
 //   createWorker 丟例外 → mainThread      → C-07
 //   initTimeoutMs 逾時 → failed           → C-09
 //   取消後遲到的結果被丟棄                → C-10
+//   S13／m-3（D-35）主執行緒路徑：例外 → INTERNAL（C-14）、failed 模式不同步丟出（C-15）、
+//   主執行緒取消（C-16）、主執行緒 watchdog（C-17）
 'use strict';
 
 var test = require('node:test');
@@ -532,10 +534,12 @@ test('C-08 Worker onerror → mainThread；進行中的請求改在主執行緒�
   w.handlers.onError(new Error('測試：Worker 當掉'));
   assert.ok(w.terminated);
   assert.equal(c.client.status().state, 'mainThread');
-  assert.equal(c.clock.pending(), 1, '只剩主執行緒排程，solve watchdog 已清除');
+  // S13／m-3：主執行緒路徑也有 watchdog，所以剩「主執行緒排程＋主執行緒 watchdog」兩個；Worker 的 solve watchdog 已清除
+  assert.equal(c.clock.pending(), 2, '只剩主執行緒排程與主執行緒 watchdog，Worker 的 solve watchdog 已清除');
   c.clock.advance(0);
   await flush();
   assert.deepEqual(a.t.value.payload.tokens, ["R'"]);
+  assert.equal(c.clock.pending(), 0, 'S13：job 完成後主執行緒 watchdog 一併清除');
   // 已終止的 Worker 再送訊息或錯誤都不影響
   w.reply({ type: 'result', id: 99, kind: 'solve', moves: ['U'], qtm: 1, nodes: 1, complete: true });
   w.handlers.onError(new Error('再一次'));
@@ -732,4 +736,167 @@ test('C-13 solver-client.js 不直接讀時鐘或計時器（一律透過 deps�
   assert.ok(src.indexOf('SOLVER_WORKER_SRC') >= 0, '預設 createWorker 讀 window.SOLVER_WORKER_SRC（X-6）');
   assert.throws(function () { clientModule.createSolverClient({ engine: engine, params: params, lblConfig: lblConfig }); });
   assert.throws(function () { clientModule.createSolverClient({}); });
+});
+
+// ---------------------------------------------------------------------------
+// S13／m-3（D-35）：主執行緒路徑的例外保護、watchdog 與「取消」
+// 重現來源：docs/reports/T-001-code-review.md m-3（reviewer 的 cr-solver.js：createWorker 丟例外
+// 進入 mainThread，solve 丟 'solver bug' → timer 回呼丟出例外、提示 Promise 永遠沒有結果）。
+// ---------------------------------------------------------------------------
+
+function throwingLbl() {
+  return Object.assign({}, lbl, { generateLbl: function () { throw new Error('測試：lbl bug'); } });
+}
+
+function mainThreadClient(fake, lblImpl, clock) {
+  var workers = makeWorkers();
+  workers.throwOnCreate = true;
+  var c = makeClient({ workers: workers, clock: clock, solvers: { twophase: fake, lbl: lblImpl || lbl } });
+  c.client.start();
+  assert.equal(c.client.status().state, 'mainThread');
+  return c;
+}
+
+test('C-14 主執行緒 solve／層先法丟例外 → 以 INTERNAL 結束（與 Worker 路徑一致），計時器回呼不丟出、後面的 job 照常處理', async function () {
+  var fake = fakeTwophase(null);
+  fake.solve = function () { throw new Error('solver bug'); };
+  var c = mainThreadClient(fake, throwingLbl());
+
+  // (1) 提示：reviewer 的重現情境
+  var a = askHint(c.client, stateFrom([], ['R', 'U']));
+  assert.doesNotThrow(function () { c.clock.advance(0); }, '計時器回呼不得把求解器例外往外丟');
+  await flush();
+  assert.equal(a.t.done, true, '提示的 Promise 必須有結果');
+  assert.deepEqual(a.t.value, { type: 'HINT_FAILED', payload: { version: a.state.version, code: 'INTERNAL' } });
+  assert.equal(clientModule.failureTextKey('INTERNAL'), 'error.generic', '沿用既有失敗碼與文案鍵，不新增文案');
+  var after = engine.reduce(a.state, a.t.value, DATA);
+  assert.equal(after.hint, null, 'HINT_FAILED 被 reducer 接受，離開等待中');
+  assert.equal(c.client.status().state, 'mainThread', '與 Worker 路徑相同：單次例外不改變求解器狀態');
+  assert.equal(c.clock.pending(), 0, '沒有殘留的排程或 watchdog');
+
+  // (2) 建議解示範：同樣以 INTERNAL 結束
+  var d = reduce(stateFrom([], ['F']), 'DEMO_REQUEST', { kind: 'suggest', at: 0 });
+  var dt = track(c.client.requestDemo(d, 'suggest'));
+  c.clock.advance(0);
+  await flush();
+  assert.deepEqual(dt.value, { type: 'DEMO_FAILED', payload: { version: d.version, code: 'INTERNAL' } });
+
+  // (3) 層先法示範：generateLbl 丟例外 → INTERNAL
+  var l = reduce(stateFrom([], ['B']), 'DEMO_REQUEST', { kind: 'lbl', at: 0 });
+  var lt = track(c.client.requestDemo(l, 'lbl'));
+  c.clock.advance(0);
+  await flush();
+  assert.deepEqual(lt.value, { type: 'DEMO_FAILED', payload: { version: l.version, code: 'INTERNAL' } });
+  assert.equal(engine.reduce(l, lt.value, DATA).demo, null);
+
+  // (4) solve 回傳格式不符（acceptSolve 丟例外）→ INTERNAL
+  fake.solve = function () { return { moves: [], names: 'not-array', qtm: 0, nodes: 1, complete: true }; };
+  var b = askHint(c.client, stateFrom([], ['L']));
+  c.clock.advance(0);
+  await flush();
+  assert.equal(b.t.value.payload.code, 'INTERNAL');
+
+  // (5) 修好之後，同一個 client 仍能正常求解（佇列沒有卡住）
+  fake.solve = function () { return { moves: [], names: ["D'"], qtm: 1, nodes: 1, complete: true }; };
+  var ok = askHint(c.client, stateFrom([], ['D']));
+  c.clock.advance(0);
+  await flush();
+  assert.deepEqual(ok.t.value.payload.tokens, ["D'"]);
+});
+
+test('C-15 failed 模式：層先法同步丟例外時 requestHint／requestDemo 不同步丟出，改回傳 INTERNAL；state 可離開等待中', async function () {
+  var c = makeClient({ solvers: { twophase: twophase, lbl: throwingLbl() } });
+  c.client.start();
+  c.clock.advance(SP.initTimeoutMs); // 建表逾時 → failed（同 C-09）
+  assert.equal(c.client.status().state, 'failed');
+
+  var s = reduce(stateFrom([], ['R']), 'HINT_REQUEST', { at: 0 });
+  var p;
+  assert.doesNotThrow(function () { p = c.client.requestHint(s); }, 'requestHint 不得同步丟例外');
+  var h = track(p);
+  await flush();
+  assert.deepEqual(h.value, { type: 'HINT_FAILED', payload: { version: s.version, code: 'INTERNAL' } });
+  assert.equal(engine.reduce(s, h.value, DATA).hint, null, '結果可被 dispatch，提示離開等待中（不必靠重設／打亂）');
+
+  var l = reduce(stateFrom([], ['U']), 'DEMO_REQUEST', { kind: 'lbl', at: 0 });
+  var lp;
+  assert.doesNotThrow(function () { lp = c.client.requestDemo(l, 'lbl'); });
+  var lt = track(lp);
+  await flush();
+  assert.deepEqual(lt.value, { type: 'DEMO_FAILED', payload: { version: l.version, code: 'INTERNAL' } });
+  assert.equal(engine.reduce(l, lt.value, DATA).demo, null);
+
+  // 建議解示範在 failed 模式本來就回 SOLVER_FAILED（不變）
+  var g = reduce(stateFrom([], ['F']), 'DEMO_REQUEST', { kind: 'suggest', at: 0 });
+  var gt = track(c.client.requestDemo(g, 'suggest'));
+  await flush();
+  assert.equal(gt.value.payload.code, 'SOLVER_FAILED');
+
+  // 連 state 本身都讀不了（solverInput 丟例外）也只回傳失敗 action
+  var bad;
+  assert.doesNotThrow(function () { bad = c.client.requestHint({ version: 7 }); });
+  var bt = track(bad);
+  await flush();
+  assert.deepEqual(bt.value, { type: 'HINT_FAILED', payload: { version: 7, code: 'INTERNAL' } });
+  assert.equal(c.client.cancel(), null, '沒有殘留的等待中請求');
+});
+
+test('C-16 主執行緒路徑的「取消」：排程中取消立即以 CANCELLED 結束，之後不再求解；取消後可再請求', async function () {
+  var fake = fakeTwophase({ moves: [], names: ["R'"], alg: '', qtm: 1, nodes: 5, complete: true });
+  var c = mainThreadClient(fake);
+  var a = askHint(c.client, stateFrom([], ['R']));
+  var cancelled = c.client.cancel();
+  assert.deepEqual(cancelled, { type: 'HINT_FAILED', payload: { version: a.state.version, code: 'CANCELLED' } });
+  await flush();
+  assert.deepEqual(a.t.value, cancelled);
+  assert.equal(engine.reduce(a.state, cancelled, DATA).hint, null);
+  c.clock.advance(SP.solveTimeoutMs * 2);
+  await flush();
+  assert.equal(fake.solveOpts.length, 0, '已取消的 job 不再求解');
+  assert.equal(c.clock.pending(), 0, '取消時 watchdog 一併清除');
+
+  var b = askHint(c.client, stateFrom([], ['R']));
+  c.clock.advance(0);
+  await flush();
+  assert.deepEqual(b.t.value.payload.tokens, ["R'"]);
+});
+
+// 模擬「0 ms 的排程計時器一直沒被執行」（例如被瀏覽器延後或遺失）：只丟掉 0 ms 的計時器
+function lossyClock() {
+  var clock = makeClock();
+  var realSet = clock.setTimer;
+  clock.dropped = 0;
+  clock.setTimer = function (fn, ms) {
+    if (ms === 0) { clock.dropped++; return { lost: true }; }
+    return realSet(fn, ms);
+  };
+  return clock;
+}
+
+test('C-17 主執行緒 watchdog：排程後遲遲沒有執行 → solveTimeoutMs 後提示退回層先法、建議解示範回 TIMEOUT', async function () {
+  var clock = lossyClock();
+  var fake = fakeTwophase({ moves: [], names: ["R'"], alg: '', qtm: 1, nodes: 5, complete: true });
+  var c = mainThreadClient(fake, lbl, clock);
+
+  var a = askHint(c.client, stateFrom([], ['R']));
+  clock.advance(SP.solveTimeoutMs - 1);
+  await flush();
+  assert.equal(a.t.done, false);
+  clock.advance(1);
+  await flush();
+  assert.ok(clock.dropped >= 1);
+  assert.equal(a.t.value.type, 'HINT_READY', '逾時後提示改用層先法（與 Worker 路徑 C-05 相同）');
+  assert.equal(a.t.value.payload.source, 'lbl');
+  engine.reduce(a.state, a.t.value, DATA);
+  assert.equal(fake.solveOpts.length, 0);
+
+  var clock2 = lossyClock();
+  var c2 = mainThreadClient(fakeTwophase(null), lbl, clock2);
+  var d = reduce(stateFrom([], ['F']), 'DEMO_REQUEST', { kind: 'suggest', at: 0 });
+  var dt = track(c2.client.requestDemo(d, 'suggest'));
+  clock2.advance(SP.solveTimeoutMs);
+  await flush();
+  assert.deepEqual(dt.value, { type: 'DEMO_FAILED', payload: { version: d.version, code: 'TIMEOUT' } });
+  assert.equal(clientModule.failureTextKey('TIMEOUT'), 'demo.suggestUnavailable');
+  assert.equal(clock2.pending(), 0);
 });

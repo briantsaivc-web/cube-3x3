@@ -1,6 +1,6 @@
 {
   "name": "cube-3x3",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "魔術方塊（暫名）：三階魔術方塊單頁網頁遊戲（零依賴、單一 index.html）",
   "scripts": {

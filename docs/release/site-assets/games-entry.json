@@ -1,0 +1,15 @@
+{
+  "id": "cube-3x3",
+  "title": "魔術方塊",
+  "category": "空間解謎",
+  "description": "手邊沒有實體方塊，也能在瀏覽器裡轉一轉魔術方塊。提供提示、電腦的建議解法示範與記號小教室，陪你用層先法一步步練習。",
+  "url": "https://briantsaivc-web.github.io/cube-3x3/",
+  "cover": "assets/games/cube-3x3.svg",
+  "coverAlt": "深藍背景中的原創三階魔術方塊插畫，六色貼紙錯落分布",
+  "devices": ["phone", "tablet", "desktop"],
+  "deviceLabel": "手機直向・平板橫向・電腦",
+  "deviceNote": "瀏覽器自動測試已完成；手機與 iPad 實機操作體驗待驗證。",
+  "accent": "violet",
+  "order": 7,
+  "published": true
+}

@@ -6,6 +6,10 @@
 // clearDrag／nearestOrientFrom／snapFrom／multiplyMatrix／axisAngleMatrix，不自己重算 3D 幾何。
 // S11／B-2：吸附改用 nearestOrientFrom／snapFrom（計入拖曳開始時的朝向）；舊的
 // nearestOrient／snapTo 只在朝向 0 時正確，本檔不再使用。
+// S13／m-2（D-35）：轉視角期間暫停的輸入佇列（input.hold）改由共用收尾函式保證解除：
+// 吸附成功、吸附 Promise 失敗或同步丟例外、吸附回呼內 dispatch 丟例外，以及 pointercancel、
+// lostpointercapture、落在舞台外的 pointerup（未取得 capture 時由文件層級接住）、頁面轉入背景，
+// 全部都會放行佇列；否則記號鍵、撤銷、示範單步會跟著永久失效。
 // S11／D-26：轉層的送出改走 ctx.input 的輸入佇列（與記號鍵同一機制）；但「開始」一個手勢
 // 仍要求畫面靜止（ctx.input.idle()）：手指按下時要依畫面判斷碰到哪一張貼紙，動畫中的
 // 小方塊位置正在變動，若允許排隊會轉錯層，所以動畫中的手勢照舊不接受。
@@ -113,14 +117,50 @@ function mount(ctx) {
 
   function endSession() {
     if (!session) return;
-    if (session.mode === 'turn') view.highlight([]);
-    releaseCapture(scene, session.pointerId);
+    // S13：先清掉 session 再釋放 capture，任何同步觸發的 lostpointercapture 都會被當成「已結束」而略過。
+    var ended = session;
     session = null;
+    if (ended.mode === 'turn') view.highlight([]);
+    releaseCapture(scene, ended.pointerId);
   }
 
   // 轉視角期間暫停輸入佇列（不清空），吸附完成後才放行，避免記號鍵的整顆轉動畫與拖曳互搶 transform。
   function releaseViewHold() {
     input.release(VIEW_HOLD);
+  }
+
+  // S13／m-2：不吸附、直接彈回原樣並放行佇列（pointercancel、lostpointercapture、頁面隱藏、
+  // 吸附動畫失敗時共用）。clearDrag 即使丟例外也一定放行。
+  function abortViewDrag() {
+    try {
+      view.clearDrag();
+    } finally {
+      releaseViewHold();
+    }
+  }
+
+  // S13／m-2：吸附動畫結束後的收尾。onSnapped 丟例外時仍會 clearDrag 並放行佇列；
+  // 例外不再往外丟（與 app.js 輸入佇列「單一 UI 錯誤不影響佇列」同一原則），避免未處理的 Promise 拒絕。
+  function afterSnap(snapPromise, onSnapped) {
+    Promise.resolve(snapPromise).then(function () {
+      try {
+        onSnapped();
+      } catch (err) {
+        try { view.clearDrag(); } catch (e2) { /* 已在收尾中，忽略 */ }
+      } finally {
+        releaseViewHold();
+      }
+    }, function () {
+      abortViewDrag();
+    });
+  }
+
+  // S13／m-2：非正常結束的共用出口（pointercancel、lostpointercapture、頁面隱藏）。
+  function abortSession() {
+    if (!session) return;
+    var wasView = session.mode === 'view';
+    endSession();
+    if (wasView) abortViewDrag();
   }
 
   // -------------------------------------------------------------------------
@@ -229,29 +269,37 @@ function mount(ctx) {
   }
 
   function finishViewSession() {
-    var state = ctx.getState();
     var fromOrient = session.fromOrient;
-    if (state.demo !== null || state.orient !== fromOrient) {
-      // 示範中：拖曳只傾斜，放開彈回原朝向、不送 action（§9.3 最後一點、§4 補充）。
-      // snapFrom(o, o) 的終點是單位矩陣＝「這次拖曳開始前的樣子」；結束後 clearDrag() 讓
-      // transform 精確歸零。（拖曳期間朝向若被其他來源改掉，也同樣只彈回、不送 action。）
-      view.snapFrom(fromOrient, fromOrient, SNAP_ANIM_MS).then(function () {
-        view.clearDrag();
-        releaseViewHold();
-      });
+    var matrix = session.matrix;
+    var snapPromise;
+    var onSnapped;
+    try {
+      var state = ctx.getState();
+      if (state.demo !== null || state.orient !== fromOrient) {
+        // 示範中：拖曳只傾斜，放開彈回原朝向、不送 action（§9.3 最後一點、§4 補充）。
+        // snapFrom(o, o) 的終點是單位矩陣＝「這次拖曳開始前的樣子」；結束後 clearDrag() 讓
+        // transform 精確歸零。（拖曳期間朝向若被其他來源改掉，也同樣只彈回、不送 action。）
+        onSnapped = function () { view.clearDrag(); };
+        snapPromise = view.snapFrom(fromOrient, fromOrient, SNAP_ANIM_MS);
+      } else {
+        // S11／B-2：目標朝向＝「拖曳矩陣 · 目前朝向」最接近的朝向；點一下（矩陣為單位）時就是原朝向。
+        var targetOrient = view.nearestOrientFrom(fromOrient, matrix);
+        onSnapped = function () {
+          var action = { type: 'SET_ORIENT', payload: { orient: targetOrient } };
+          if (targetOrient !== fromOrient && engine.canApply(ctx.getState(), action, ctx.data)) {
+            ctx.dispatch(action); // render() 會把 transform 歸零並改用新朝向的顏色
+          } else {
+            view.clearDrag();
+          }
+        };
+        snapPromise = view.snapFrom(fromOrient, targetOrient, SNAP_ANIM_MS);
+      }
+    } catch (err) {
+      // S13／m-2：吸附動畫無法開始（同步丟例外）→ 直接彈回並放行佇列。
+      abortViewDrag();
       return;
     }
-    // S11／B-2：目標朝向＝「拖曳矩陣 · 目前朝向」最接近的朝向；點一下（矩陣為單位）時就是原朝向。
-    var targetOrient = view.nearestOrientFrom(fromOrient, session.matrix);
-    view.snapFrom(fromOrient, targetOrient, SNAP_ANIM_MS).then(function () {
-      var action = { type: 'SET_ORIENT', payload: { orient: targetOrient } };
-      if (targetOrient !== fromOrient && engine.canApply(ctx.getState(), action, ctx.data)) {
-        ctx.dispatch(action); // render() 會把 transform 歸零並改用新朝向的顏色
-      } else {
-        view.clearDrag();
-      }
-      releaseViewHold();
-    });
+    afterSnap(snapPromise, onSnapped);
   }
 
   // -------------------------------------------------------------------------
@@ -320,21 +368,32 @@ function mount(ctx) {
 
   function onPointerUp(e) {
     if (!session || session.pointerId !== e.pointerId) return;
-    if (session.mode === 'turn') {
-      commitTurnIfNeeded();
-    } else if (session.mode === 'view') {
-      finishViewSession();
+    var wasView = session.mode === 'view';
+    var finished = false;
+    try {
+      if (session.mode === 'turn') {
+        commitTurnIfNeeded();
+      } else if (wasView) {
+        finishViewSession(); // 內部保證最後會放行佇列
+      }
+      finished = true;
+    } finally {
+      endSession();
+      // S13／m-2：收尾本身意外丟例外（例如讀 state 失敗）時，仍要放行佇列。
+      if (wasView && !finished) abortViewDrag();
     }
-    endSession();
   }
 
-  function onPointerCancel(e) {
+  // pointercancel 與 lostpointercapture（S13／m-2 新增）：不吸附、直接彈回，並放行佇列。
+  // 正常放開時 lostpointercapture 會在 pointerup 之後才到，此時 session 已清空，不會重複處理。
+  function onPointerAbort(e) {
     if (!session || session.pointerId !== e.pointerId) return;
-    if (session.mode === 'view') {
-      view.clearDrag();
-      releaseViewHold();
-    }
-    endSession();
+    abortSession();
+  }
+
+  // S13／m-2：頁面轉入背景時，進行中的手勢一律作廢（回來時通常已收不到原本那一指的 pointerup）。
+  function onVisibilityChange() {
+    if (doc.visibilityState === 'hidden') abortSession();
   }
 
   // 文件層級：偵測「第二指落在舞台之外」的雙指情形（§9.2 第 5 點沒有限定第二指的落點）。
@@ -345,8 +404,14 @@ function mount(ctx) {
   scene.addEventListener('pointerdown', onScenePointerDown);
   scene.addEventListener('pointermove', onPointerMove);
   scene.addEventListener('pointerup', onPointerUp);
-  scene.addEventListener('pointercancel', onPointerCancel);
+  scene.addEventListener('pointercancel', onPointerAbort);
+  scene.addEventListener('lostpointercapture', onPointerAbort);
   doc.addEventListener('pointerdown', onDocPointerDown);
+  // S13／m-2：未取得 pointer capture 時（setPointerCapture 失敗），放開或取消可能落在舞台以外，
+  // 由文件層級接住。舞台上的事件冒泡到這裡時 session 已被清空，不會重複處理。
+  doc.addEventListener('pointerup', onPointerUp);
+  doc.addEventListener('pointercancel', onPointerAbort);
+  doc.addEventListener('visibilitychange', onVisibilityChange);
 }
 
 module.exports = {

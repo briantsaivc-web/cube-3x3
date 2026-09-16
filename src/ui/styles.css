@@ -185,6 +185,25 @@ button { font-family: inherit; }
 .kp.kp-mid { background: #eef3ff; border-color: #0a6cff; color: #0a3b8f; }
 .kp.kp-rot { background: #f2f2f2; border-style: dashed; border-color: #999; color: #555; }
 
+/* S13／D-35（QA Minor-1）：iPad 橫向記號鍵中文副標原為 10px，偏小。
+   以視窗寬度分兩段放大，並把鍵的左右內距縮為 2px，讓最長的四字副標（如「上・半圈」）
+   在一列 6 顆鍵時仍放得下一行：寬 ≥1100px（iPad 1133／1180／1194／1366 橫向）用 13px；
+   1000–1099px（iPad 1024／1080 橫向）用 12px。手機直向另見下方 D-36（11px＋內距 2px；12px 會換行）；
+   手機橫向（寬 < 1000px）不套用（量測見 docs/reports/T-001-S13.md）。
+   只改字級與左右內距，按鍵 min-width／min-height 44px 不動。 */
+@media (orientation: landscape) and (min-width: 1000px) {
+  .kp { padding-left: 2px; padding-right: 2px; }
+  .kp-sub { font-size: 12px; }
+}
+@media (orientation: landscape) and (min-width: 1100px) {
+  .kp-sub { font-size: 13px; }
+}
+/* 幕僚長 D-36（2026-09-16）：手機直向副標 11px＋左右內距 2px（S13 實測 390／360 寬不換行）。 */
+@media (orientation: portrait) {
+  .kp { padding-left: 2px; padding-right: 2px; }
+  .kp-sub { font-size: 11px; }
+}
+
 /* ---- 插槽用容器 ---- */
 .slot-block { margin-bottom: 10px; }
 .overlay-root:empty { display: none; }
