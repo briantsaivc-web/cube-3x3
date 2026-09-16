@@ -16,3 +16,7 @@
 - G4.5：製作人用具備檔案工具的 Gemini 直接讀本機 4 個審查包（還自行跑了 engine 測試）。外部提出 3 bug＋1 疑似；幕僚長寫 Playwright 實證腳本 `tests/ui/triage-g45.js` 逐條對決：E-1、E-2 證實（E-2：跳過教學後 12 張貼紙與狀態不符），E-3「閃一幀」逐幀記錄未重現、不採納，S-1 屬規格既定、轉為設計題交製作人。再次印證「外部 AI 說」不是證據，要用最小測試定案。
 - G6：release-manager（haiku）初稿的 CHANGELOG 把建議解寫成「最短路線」、編造項目、把已修問題列為未修，離線測試也沒有真的操作 → 幕僚長逐句對照來源重寫，另寫離線操作測試。規則：**便宜模型起草的發布文件與驗證腳本，必須逐句對照來源、實際看腳本做了什麼**。
 - G6：連線中斷時不讓製作人 push（本機仍是舊版）；連線恢復後先同步、逐檔比對（182 檔一致、版本 0.1.0、sha256 相符），才放行 push。
+- 上架踩坑 1：製作人在小站 `games.json` 加了一筆，但找不到封面檔（它在遊戲 repo 的 `docs/release/site-assets/` 深層資料夾，上架說明只寫檔名沒寫完整路徑）→ 小站出現缺圖、`tools/validate.py` 失敗。規則：**上架說明要寫本機完整路徑與 GitHub 下載網址，並先上傳封面、再改 games.json**。
+- 上架踩坑 2：遊戲網址 404 → GitHub Pages 尚未開啟／尚未建置完成。規則：**先確認遊戲網址能開，才改小站清單**（說明裡有寫，但順序容易被跳過）。
+- 上架踩坑 3：封面上傳後小站正常，但「開始遊戲」404「There isn't a GitHub Pages site here」。製作人以為小站連結寫錯；幕僚長核對：小站 7 筆網址格式一致、`validate.py` 通過、cube-3x3 repo 為公開且 main 分支有 index.html → 連結正確，原因是 **cube-3x3 repo 尚未開啟 GitHub Pages**。規則：上架說明把「開 Pages」放第一步，並附 Settings → Pages 的直接網址與畫面截圖。
+- 上架踩坑 4：開啟 Pages 後建置失敗（pages build and deployment → build 紅叉）。原因：GitHub Pages 預設用 Jekyll 轉換 repo 內所有 Markdown，審查包裡的程式碼含 `{{`、`{%`，被當成 Jekyll 樣板語法而出錯。修法：repo 根目錄放一個空檔 `.nojekyll`。規則：**單頁遊戲 repo 骨架一開始就放 `.nojekyll`**（小站 repo 本來就有）。

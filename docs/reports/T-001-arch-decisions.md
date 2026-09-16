@@ -43,3 +43,4 @@
 | D-36 | S13 待決（手機直向副標） | 手機直向副標是否放大 | 幕僚長依低風險格式細節直接決定：直向 11px＋左右內距 2px；390／360 寬 36 鍵皆不換行、≥44px（`scratch/s13-phone-check.js`） | 幕僚長自跑 engine 100/100、UI 35 項×2 視圖全過 |
 | D-37 | S13 審查（通過，3 Minor） | m-1 主執行緒排程遺失後第二個請求無 watchdog；m-2 T-UI-36 未鎖 11px；m-3 註解過時 | m-2、m-3 幕僚長直接修（測試門檻與註解）；m-1 列 v0.2（需 0 ms 排程遺失才觸發，可按取消離開） | — |
 | D-38 | 上架草稿 | 小站分類與色標 | 分類「空間解謎」、accent violet（避免與相鄰兩款 gold 連續同色）；簡介中文逗號改全形 | ui-designer 建議，幕僚長採用 |
+| D-39 | G6 上線（GitHub Pages 建置失敗） | Pages 預設用 Jekyll 處理 repo 內所有 .md；審查包 `review-pack-1/2/4.md` 內含程式碼的 `{{`／`{%`，被當成 Liquid 語法而建置失敗，網站未部署（404） | 在 repo 根目錄加入空檔 `.nojekyll`，讓 Pages 直接提供靜態檔、不跑 Jekyll（遊戲小站 repo 已採同樣做法） | 下一款遊戲的 repo 骨架預設就放 `.nojekyll` |
