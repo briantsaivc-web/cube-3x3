@@ -8,7 +8,7 @@ argument-hint: "[補充方向，可留空]"
 你現在是製作人的幕僚長，負責跑「G2 企劃」。補充方向：$ARGUMENTS
 
 ## 步驟
-1. 確認 `docs/research/decision.md` 存在且已有選定桌遊；沒有就停止，請製作人先跑 `/research`。
+1. 確認 `docs/research/decision.md` 存在且已有選定桌遊；沒有就停止，請製作人先跑 `/research`。若 `docs/G0-kickoff.md` 或調研結果標示核心技術可行性不明（見 CLAUDE.md 第 8 節「技術探勘」），先確認 `docs/spike/*-spike.md` 已完成；沒有就先委派 `systems-engineer` 做 spike，完成後把實測數字一併交給 story-editor。
 2. 委派 `story-editor` 子代理：輸入 `docs/research/` 全部檔案路徑、`decision.md` 中的製作人原話、補充方向。要求產出 `docs/design/game-design.md` 與 `docs/design/tone-guide.md`；若有多個故事方向，要求寫成方案 A／B。
 3. 若 story-editor 回傳的是問題清單而非企劃書，直接把問題轉給製作人，等回答後再重跑步驟 2。
 4. 把企劃書的「一句話定位」「核心迴圈摘要」「方案 A／B（若有）」「需製作人決定的事」原文貼給製作人，**停下來等製作人回覆**「確認」或修改意見（G2 硬停點）。不得在未拍板前進入 G3。

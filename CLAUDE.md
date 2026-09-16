@@ -37,6 +37,7 @@ tests/            自動化測試
 index.html        打包產物（不要手改）
 docs/research/    G1 市場調研：候選桌遊、機制分析、風險
 docs/design/      G2 企劃：故事、世界觀、核心迴圈
+docs/spike/       G2 前技術探勘：量測腳本與報告（技術可行性不明時才有，見第 8 節）
 docs/spec/        G3 規格：game-spec.md、資料格式、action 清單
 docs/ui/          G3.5 UI 三版靜態稿與 decision-log.md
 docs/tickets/     任務單與分派單（T-<編號>/）
@@ -45,6 +46,9 @@ docs/qa/          QA 報告
 docs/reports/     各角色回報（長輸出寫這裡）
 docs/templates/   任務單、ADR、回報、UI 三版對照表範本
 docs/changelog/   CHANGELOG.md
+docs/release/     遊戲小站上架說明與封面（site-listing.md、site-assets/）
+.nojekyll         空白檔，讓 GitHub Pages 不跑 Jekyll（骨架預設，不要刪；少了它，文件裡的 {{ 會讓 Pages 建置失敗）
+.gitignore        骨架預設排除 node_modules/、*.backup.*、scratch/、_to_delete/、Claude outputs/
 ```
 
 ## 3. 不可違反的架構原則（違反＝任務失敗，reviewer 必退件）
@@ -68,6 +72,8 @@ docs/changelog/   CHANGELOG.md
 ## 5. 所有角色共同的工作紀律
 
 - **不自驗宣稱完成。** 「完成」必須附證據：測試輸出、檔案路徑、diff 摘要、截圖。沒跑測試就說「未測試」。
+- **UI 修正看截圖才算數。** 任何畫面修正的回報必須附手機直向與 iPad 橫向截圖的路徑，由幕僚長親自打開看過才放行；子代理寫「已目視確認」不算證據。（2026-09-16 G7 拍板）
+- **AI 不在製作人電腦上執行 git。** 包含 `git status` 這類看似唯讀的指令（會在 `.git/` 留下鎖定檔）。AI 只在雲端副本跑 git；製作人本機的 git 操作由 AI 寫成可複製的指令、由製作人執行；clone 指令要寫明在哪一層資料夾執行，避免巢狀資料夾。（2026-09-16 G7 拍板）
 - **查不到就標 UNKNOWN。** 不用記憶補數字、不編造 API、不把推論寫成事實。找不到檔案就說找不到，不要創造一個。
 - **改既有檔案前先備份**：`<原檔名>.backup.<YYYYMMDD>`（或確認 git 工作區乾淨可回復）。備份檔已列入 `.gitignore`。
 - **只動任務單指定的範圍。** 順手改到範圍外的東西，一律寫進回報的「未預期發現」，不得靜默處理。
@@ -103,7 +109,7 @@ docs/changelog/   CHANGELOG.md
 
 | Gate | 名稱 | 負責角色 | 主要產物 | 硬停點 |
 |---|---|---|---|---|
-| G0 | 開案 | 製作人 | 本 CLAUDE.md 第 1 節填妥、repo 骨架 | — |
+| G0 | 開案 | 製作人 | 本 CLAUDE.md 第 1 節填妥、repo 骨架（含 `.gitignore`、空白 `.nojekyll`） | — |
 | G1 | 市場調研 | market-researcher | `docs/research/` 候選桌遊比較、推薦與風險 | **是**：製作人選定要改編的桌遊 |
 | G2 | 企劃 | game-designer（story-editor） | `docs/design/` 玩法、模式流程、文案（本案無故事線） | **是**：製作人拍板企劃方向 |
 | G3 | 規格 | systems-engineer | `docs/spec/game-spec.md`、資料格式、分派單 | 否（併入 G3.5 停點） |
@@ -117,3 +123,7 @@ docs/changelog/   CHANGELOG.md
 對應技能：G1 `/research`、G2 `/plan-story`、G3＋G3.5 `/spec`、G4 `/build`、G4.5 `/cross-review`、G5 `/qa-gate`、G6 `/release`。
 
 G4.5 的原則（沿用《讓 AI 互相抓錯：交叉審查與實證裁決》一章）：驗的人不能是寫的人；外部 AI 只給意見、不重寫程式；「三個 AI 都同意」不是證據，有分歧的項目以**實證裁決**（寫最小測試讓兩方說法對決）定案；最多兩輪，兩輪後仍無共識由製作人裁決或列入待辦。course-recorder 在每個 Gate 結束時由幕僚長委派，不獨立成技能。
+
+G4.5 審查包的產生方式（2026-09-16 G7 拍板）：程式碼片段、檔案清單、已知問題一律用腳本從 repo 抽取產生（範例 `docs/templates/review-pack-gen.example.py`），模型只寫說明文字；不讓模型手抄程式碼或自行整理已知問題。由便宜模型（haiku）起草的任何對外文件，幕僚長須逐句對照來源檔後才交給製作人。
+
+技術探勘（spike）放在 G2 之前（2026-09-16 G7 拍板）：G0 或 G1 發現核心技術可行性不明（演算法密集、效能或檔案大小未知）時，G2 開始前由 systems-engineer 做 spike——寫不進產品的量測腳本，產物 `docs/spike/<主題>-spike.md`，把企劃與規格要用的 UNKNOWN 換成實測數字。spike 不另設硬停點，結論由幕僚長摘要給製作人，並作為 G2 企劃的輸入。

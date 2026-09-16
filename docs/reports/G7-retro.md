@@ -44,10 +44,12 @@
 - 企劃：限步挑戰（可用「≤14 QTM 最少步 1 秒內」的實測能力）、互動式逐段教學、每日挑戰、群論小教室、2D 展開圖、建表期間主執行緒即時產生層先法示範。
 - 驗證：iPad Safari 實機的 E-3（打亂閃一幀）觀察。
 
-## 5. 對團隊骨架的修訂建議（下一款開案時套用）
+## 5. 對團隊骨架的修訂（2026-09-16 製作人拍板「建議五項全同意改 go」，已套用到本 repo 的骨架檔）
 
-1. repo 骨架預設加入 `.nojekyll`；`.gitignore` 加 `Claude outputs/`、`_to_delete/`。
-2. CLAUDE.md §5 加兩條：「UI 修正須附幕僚長親看的截圖」「刪除匯出前先 grep 呼叫端」。
-3. release 技能加「上架清單」：Pages 開啟與網址確認 → 封面（完整路徑）→ games.json → 小站 validate.py。
-4. review-packager 改用腳本產生審查包（本案 `scratch/s10/gen.py` 的做法），模型只寫說明文字。
-5. 求解器這類演算法密集的案子，保留「spike 在 G2 前」的做法。
+1. repo 骨架預設加入空白 `.nojekyll`；`.gitignore` 預設排除 `Claude outputs/`、`_to_delete/`、`scratch/`、`*.backup.*`。→ CLAUDE.md §2 目錄地圖、§8 G0 產物。
+2. CLAUDE.md §5 加兩條：「UI 修正看截圖才算數（手機直向＋iPad 橫向，幕僚長親看）」「AI 不在製作人電腦上執行 git（含 `git status`）」。
+3. release 技能加「上架小站清單」：`.nojekyll` → 開 Pages → 確認網址能開 → 上架說明寫本機完整路徑 → 封面 → `games.json` → `validate.py` → 確認小站卡片。
+4. 審查包用腳本產生，模型只寫說明文字（範例 `docs/templates/review-pack-gen.example.py`）；haiku 起草的對外文件由幕僚長逐句對照來源。→ CLAUDE.md §8、release 技能規則、release-manager 角色（changelog 對照表、離線測試須實際操作）。
+5. 核心技術可行性不明時，spike 放在 G2 之前。→ CLAUDE.md §2、§8，plan-story 技能步驟 1。
+
+未納入（待製作人決定）：原草稿中的「刪除或改名匯出函式前先 grep 呼叫端」一條，這次拍板清單沒有列，尚未寫進 §5。

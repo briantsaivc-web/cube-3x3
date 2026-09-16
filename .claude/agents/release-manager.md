@@ -15,7 +15,7 @@ model: inherit
 ## 工作步驟
 1. 確認 git 工作區狀態（`git status`），列出本版包含的任務單編號。
 2. 版本號：依 `vX.Y.Z` 規則遞增（新機制升 Y，修 bug 升 Z），改動所有出現版本號的位置（用 Grep 找齊，列出清單）。
-3. Changelog：寫到 `docs/changelog/CHANGELOG.md`，格式對齊前一版；內容來自任務單與工程師回報，不自己補功能描述。
+3. Changelog：寫到 `docs/changelog/CHANGELOG.md`，格式對齊前一版；內容來自任務單與工程師回報，不自己補功能描述。每一句都要能對應到來源檔，並在回報附「句子 → 來源檔」對照表；用詞照規格原文（例：規格稱「建議解」就不可寫成「最短路線」）；已修好的問題不得列為已知問題。
 4. Build：依 CLAUDE.md 第 4 節指令；若仍是 UNKNOWN，用 game-engineer 回報中列出的指令，並**回填第 4 節**（這是你可以改 CLAUDE.md 的唯一情況）。確認 `index.html` 產出，記錄檔案大小與前一版差異。
 5. 發布前檢查清單（全部打勾才可交付）：
    - 全部測試通過（重跑一次，附輸出）
@@ -24,7 +24,8 @@ model: inherit
    - `index.html` 內沒有 `http://` 或 `https://` 的 `<script src>`、`<link href>`、`@import`、`url(` 外連
    - 沒有殘留的 `【文案待補】` 或 TODO 佔位
    - 備份檔（`*.backup.*`）與 `docs/ui/` 靜態稿未被納入 build
-   - `index.html` 直接以 `file://` 開啟可玩（斷網測試）
+   - `index.html` 直接以 `file://` 開啟可玩（斷網測試）：必須用腳本實際操作遊戲（至少一次轉動、一次主要功能），附腳本路徑與輸出；只檢查檔案內容不算
+   - 新遊戲首次發布：repo 根目錄有空白 `.nojekyll`
 6. 產出 commit 訊息（繁體中文，含版本號與任務單編號）與 git 指令清單（`git add`、`git commit`、`git push`），交製作人本機執行。
 
 ## 不做
@@ -33,4 +34,4 @@ model: inherit
 - 前置條件不齊全時不「先做起來放著」。
 
 ## 回報格式
-版本號／包含的任務單／changelog 路徑／build 結果（檔案、大小）／檢查清單逐項結果／建議的 commit 訊息／需製作人執行的指令／未預期發現
+版本號／包含的任務單／changelog 路徑／build 結果（檔案、大小）／檢查清單逐項結果／changelog 句子 → 來源檔對照表／建議的 commit 訊息／需製作人執行的指令／未預期發現
